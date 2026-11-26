@@ -30,13 +30,13 @@ const GITHUB_URL = 'https://github.com/nehhaank'
 
 type Art = 'chat' | 'tiles' | 'steps' | 'grid' | 'bars' | 'form'
 
-const projects: { title: string; where: string; art: Art; note: string; featured?: boolean }[] = [
-  { title: 'AI Interviewer', where: 'WeCP', art: 'chat', featured: true, note: 'Helped shape the first AI interviewer, then structured vs. adaptive modes and multiple interviewers. The puzzle: make an unfamiliar AI conversation easy to understand and set up.' },
-  { title: 'Tests in any language', where: 'WeCP', art: 'tiles', featured: true, note: 'Language choice, fallbacks, switching mid-test and translated reports, so a candidate anywhere gets the same fair test.' },
-  { title: 'Candidate onboarding', where: 'WeCP', art: 'steps', note: 'Reworked registration to take the friction out of the minutes before a test even begins.' },
-  { title: 'Capacity planner', where: 'Invisible Technologies', art: 'grid', note: 'A dense internal planning tool, rebuilt around one clear grid with views by profile, work type and cohort.' },
-  { title: 'Savings dashboard', where: 'Invisible Technologies', art: 'bars', note: 'Made modeled savings readable and traceable: one hero number, honest comparisons, and the math laid open.' },
-  { title: 'Expert applications', where: 'Invisible Technologies', art: 'form', note: 'Mapped the whole path from browsing to applying, signing up, coming back later and taking an inline assessment.' },
+const projects: { title: string; where: string; art: Art; note: string; featured?: boolean; facts?: [string, string][] }[] = [
+  { title: 'AI Interviewer', where: 'WeCP', art: 'chat', featured: true, note: 'Helped shape the first AI interviewer, then structured vs. adaptive modes and multiple interviewers. The puzzle: make an unfamiliar AI conversation easy to understand and set up.', facts: [['2 modes', 'Structured for consistency, adaptive for deep dives'], ['1 → many', 'From one AI interviewer to a panel'], ['Tested', 'Shaped through user interviews and testing']] },
+  { title: 'Tests in any language', where: 'WeCP', art: 'tiles', featured: true, note: 'Language choice, fallbacks, switching mid-test and translated reports, so a candidate anywhere gets the same fair test.', facts: [['7 pieces', 'Pick, fallback, switch, lock, label, survey, report'], ['Side by side', 'Original answers kept next to translations'], ['Admin rules', 'Auto-detect, or restrict the languages offered']] },
+  { title: 'Candidate onboarding', where: 'WeCP', art: 'steps', note: 'Reworked registration, with an AI-forward welcome, to take the friction out of the minutes before a test begins.' },
+  { title: 'Capacity planner', where: 'Invisible Technologies', art: 'grid', note: 'A dense internal planner rebuilt around one grid: switch views by profile, work type or cohort, expand rows inline, and read outputs right below.' },
+  { title: 'Savings dashboard', where: 'Invisible Technologies', art: 'bars', note: 'Made modeled savings readable and traceable: a hero number, with-and-without comparisons, period picker, baseline assumptions and the full calculation.' },
+  { title: 'Expert applications', where: 'Invisible Technologies', art: 'form', note: 'Owned design and PM for the expert journey: browse logged out, apply, sign up, resume later, and take an inline assessment.' },
 ]
 
 const smallThings = ['Report integrity', 'Proctoring status language', 'Section timers', 'Answer explanations', 'Listening questions', 'Readable graphs', 'Retake wording']
@@ -375,8 +375,8 @@ function ProjectArt({ art }: { art: Art }) {
       return (
         <div className="ui ui--bars">
           <div className="kpi">
-            <span>Modeled savings</span>
-            <b />
+            <span>Modeled savings · sample data</span>
+            <b>$128k</b>
             <em>Show the math</em>
           </div>
           <div className="bars">
@@ -427,6 +427,16 @@ function Feature({ p, i }: { p: (typeof projects)[number]; i: number }) {
         </p>
         <h3 className="feature__title">{p.title}</h3>
         <p className="feature__note">{p.note}</p>
+        {p.facts && (
+          <dl className="facts">
+            {p.facts.map(([v, l]) => (
+              <div key={v}>
+                <dt>{v}</dt>
+                <dd>{l}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
       </div>
     </li>
   )

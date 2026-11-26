@@ -2356,3 +2356,15 @@ h2 { letter-spacing: -0.012em; }
 .scorecard__kit p { display: block; }
 .scorecard__kit .card__k { display: block; margin-bottom: 6px; }
 .section__head--split .section__aside { padding-bottom: 2px; }
+.kpi b { width: auto; height: auto; background: none; font-size: 1.6em; font-weight: 800; letter-spacing: -0.02em; line-height: 1; }
+.facts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin: 8px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid rgba(243, 235, 221, 0.2);
+}
+.facts dt { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.015em; color: var(--mango); }
+.facts dd { margin: 6px 0 0; font-size: 0.86rem; line-height: 1.4; color: rgba(243, 235, 221, 0.78); }
+@media (max-width: 520px) { .facts { grid-template-columns: 1fr; } }
