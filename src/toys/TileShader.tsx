@@ -1,8 +1,9 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 
-// A wall of hand-glazed saffron tiles, drawn by a shader. Every tile is a little out of true and its glaze
-// pools unevenly; a skylight catches the gloss, and a second light follows the pointer.
+// A wall of amber glass blocks with late sun coming through, drawn by a shader. Each block is pressed
+// glass with a wavy face, so the light inside breaks into slow, rippling caustics; the mortar between
+// them is warm plaster. The pointer nudges the refraction a little, as if you were walking past.
 const frag = /* glsl */ `
   precision highp float;
   uniform float uTime;
@@ -20,62 +21,69 @@ const frag = /* glsl */ `
   float fbm(vec2 p) { float a = 0.5, s = 0.0; for (int i = 0; i < 4; i++) { s += a * noise(p); p *= 2.03; a *= 0.5; } return s; }
 
   void main() {
-    // CSS-pixel coordinates, y down
-    vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uRes / uDpr;
-    float T = 92.0;              // tile pitch
-    float G = 3.0;               // grout
+    vec2 px = vec2(vUv.x, 1.0 - vUv.y) * uRes / uDpr;   // CSS pixels, y down
+    vec2 view = uRes / uDpr;
+    float T = 118.0;             // block pitch
+    float G = 7.0;               // mortar
     vec2 id = floor(px / T);
-    vec2 f = px - id * T;        // position inside the cell
+    vec2 f = px - id * T;
     float h = hash(id);
     float h2 = hash(id + 7.3);
-    // hand-made tiles: each is a touch out of square and out of place
-    vec2 jit = (vec2(hash(id + 1.1), hash(id + 2.7)) - 0.5) * 2.2;
-    vec2 q = f - G * 0.5 - jit;
+    vec2 q = f - G * 0.5;
     float S = T - G;
-    vec2 e = min(q, S - q);      // distance to each edge
+    vec2 e = min(q, S - q);
     float edge = min(e.x, e.y);
-    float inTile = smoothstep(-0.6, 0.8, edge);
-
-    // glaze colour: saffron to marigold to a deeper ochre, the way a real wall varies
-    vec3 c1 = vec3(0.957, 0.690, 0.118);
-    vec3 c2 = vec3(0.925, 0.580, 0.086);
-    vec3 c3 = vec3(0.976, 0.765, 0.247);
-    vec3 col = mix(c1, c2, smoothstep(0.2, 0.9, h));
-    col = mix(col, c3, smoothstep(0.75, 1.0, h2) * 0.8);
-    if (h2 < 0.08) col *= 0.88;
-    // glaze pools thicker in the middle and runs thin at the edges
+    float inBlock = smoothstep(-0.5, 0.8, edge);
     vec2 uv = q / S;
-    float pool = fbm(uv * 2.2 + h * 9.0);
-    col *= 0.9 + 0.16 * pool;
-    col = mix(col * 1.08 + 0.03, col, smoothstep(1.0, 9.0, edge));
 
-    // surface normal: a pillowed tile with a wavy glaze
-    float nh = fbm(uv * 3.0 + h * 17.0 + vec2(0.0, uTime * 0.0));
-    vec2 grad = vec2(fbm(uv * 3.0 + h * 17.0 + vec2(0.01, 0.0)) - nh, fbm(uv * 3.0 + h * 17.0 + vec2(0.0, 0.01)) - nh) * 60.0;
-    vec2 bevel = vec2(
-      (smoothstep(10.0, 0.0, q.x) - smoothstep(10.0, 0.0, S - q.x)),
-      (smoothstep(10.0, 0.0, q.y) - smoothstep(10.0, 0.0, S - q.y))
-    ) * 0.55;
-    vec3 n = normalize(vec3(-bevel * vec2(1.0, 1.0) + grad * 0.35, 1.0));
+    // glass tint: honey, amber, a few marmalade and a rare deep orange, as in a real mixed wall
+    vec3 honey = vec3(0.95, 0.62, 0.17);
+    vec3 amber = vec3(0.92, 0.49, 0.11);
+    vec3 marm  = vec3(0.80, 0.36, 0.10);
+    vec3 deep  = vec3(0.66, 0.24, 0.08);
+    vec3 tint = mix(honey, amber, smoothstep(0.25, 0.7, h));
+    tint = mix(tint, marm, smoothstep(0.72, 0.9, h2));
+    tint = mix(tint, deep, step(0.93, h2) * 0.85);
 
-    // light: a skylight above and to the right, and a lamp that follows the pointer
-    vec3 V = vec3(0.0, 0.0, 1.0);
-    vec2 mp = vec2(uMouse.x, 1.0 - uMouse.y) * uRes / uDpr;
-    vec3 L1 = normalize(vec3(0.35, -0.75, 0.7));
-    vec3 L2 = normalize(vec3((mp - px) / 420.0, 0.6));
-    float diff = 0.78 + 0.22 * max(dot(n, L1), 0.0);
-    vec3 H1 = normalize(L1 + V);
-    vec3 H2 = normalize(L2 + V);
-    float spec = pow(max(dot(n, H1), 0.0), 90.0) * 0.32 + pow(max(dot(n, H2), 0.0), 160.0) * 0.5;
-    float sheen = pow(max(dot(n, H2), 0.0), 12.0) * 0.12;
-    // skylight falls off down the wall
-    float sky = 1.06 - 0.16 * smoothstep(0.0, 1.0, vUv.y < 0.0 ? 0.0 : 1.0 - vUv.y);
-    vec3 tile = col * diff * sky + vec3(1.0, 0.97, 0.88) * (spec + sheen);
+    // the sun: a warm wash from the upper right that fades across the wall
+    vec2 sunP = vec2(view.x * 0.85, -view.y * 0.2);
+    float sun = 1.0 - smoothstep(0.0, 1.25, length((px - sunP) / max(view.x, view.y)));
+    sun = 0.5 + 0.5 * sun;
 
-    // grout: chalky off-white, shadowed where it meets the tile
-    vec3 grout = vec3(0.93, 0.86, 0.74) * (0.9 + 0.1 * noise(px * 0.6));
-    grout *= 0.82 + 0.18 * smoothstep(-2.5, 0.0, edge);
-    vec3 outc = mix(grout, tile, inTile);
+    // wavy pressed glass: domain-warped ripples, nudged by the pointer and drifting very slowly
+    vec2 m = (uMouse - 0.5) * 0.35;
+    vec2 w = uv * 2.4 + h * 11.0 + m;
+    vec2 warp = vec2(fbm(w + uTime * 0.025), fbm(w + 5.2 - uTime * 0.02));
+    float wave = fbm(w * 1.4 + warp * 2.2);
+    // caustics: thin bright filaments where the waves focus the light
+    float c = 1.0 - abs(sin(wave * 4.2 + h * 6.0));
+    // calmer behind the words in the middle of the wall
+    vec2 tz = (vUv - vec2(0.5, 0.68)) * vec2(1.6, 2.4);
+    float calm = 1.0 - 0.6 * (1.0 - smoothstep(0.35, 0.9, length(tz)));
+    float caustic = (smoothstep(0.72, 1.0, c) * 0.4 + pow(c, 2.0) * 0.1) * calm;
+    // glass is thicker toward the rim, so the middle glows and the edges go dark and rich
+    float depth = smoothstep(0.0, 0.32, min(min(uv.x, 1.0 - uv.x), min(uv.y, 1.0 - uv.y)));
+    vec3 glass = tint * (0.5 + 0.32 * depth + 0.18 * wave);
+    glass += tint * vec3(1.15, 1.0, 0.75) * caustic * sun * (0.6 + 0.4 * depth);
+    glass *= 0.62 + 0.5 * sun;
+
+    // the pressed frame of each block: a dark inner groove, then a bright lip catching the sun
+    float groove = smoothstep(9.0, 4.0, edge) * smoothstep(1.0, 3.5, edge);
+    float lip = smoothstep(3.5, 1.5, edge) * smoothstep(0.0, 1.2, edge);
+    glass = mix(glass, glass * vec3(0.78, 0.5, 0.26), groove * 0.7);
+    float lit = clamp(0.4 + 0.6 * (e.y == q.y ? 1.0 : 0.6) * (e.x == S - q.x ? 1.0 : 0.7), 0.0, 1.0);
+    glass += vec3(1.0, 0.78, 0.42) * lip * lit * 0.32 * sun;
+
+    // mortar: warm plaster, picking up an orange glow from the glass on either side
+    vec3 mortar = vec3(0.72, 0.58, 0.44) * (0.92 + 0.08 * noise(px * 0.5));
+    mortar *= 0.55 + 0.45 * sun;
+    mortar += vec3(0.25, 0.11, 0.02) * sun * 0.35;
+    mortar *= 0.8 + 0.2 * smoothstep(-3.0, 0.0, edge);
+
+    vec3 outc = mix(mortar, glass, inBlock);
+    // keep it low-key: a soft vignette and a lifted middle where the words sit
+    vec2 cv = vUv - vec2(0.5, 0.55);
+    outc *= 0.86 + 0.2 * (1.0 - smoothstep(0.2, 0.85, length(cv * vec2(1.0, 1.3))));
     outc += (hash(px + uTime) - 0.5) * 0.012;
     gl_FragColor = vec4(outc, 1.0);
   }
