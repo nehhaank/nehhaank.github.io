@@ -20,7 +20,7 @@ These commands check TypeScript, build the site into `dist/`, and serve the prod
 
 ## Edit the site
 
-- `src/App.tsx`: all the words and little objects. The content lists sit at the top of the file (`projects`, `smallThings`, `blobs`, `nowNotes`). To show an email, set `CONTACT_EMAIL` near the top; it stays hidden while empty.
+- `src/App.tsx`: all the words and little objects. The content lists sit at the top of the file (`projects`, `smallThings`, `blobs`, `nowNotes`). Your contact email is `CONTACT_EMAIL` near the top; empty it to hide the email button.
 - `src/index.css`: the materials (cardboard, tape, wood, clay), colours, type and every animation. Motion is switched off automatically for visitors who ask their device for reduced motion.
 - `src/sound.ts`: the soft sounds, made in the browser with the Web Audio API. Sound is off until a visitor turns it on with the toggle in the bottom-left corner.
 - `public/404.html`: the "lost & found" page shown for missing links.

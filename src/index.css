@@ -1762,6 +1762,14 @@ h2 {
   gap: 16px;
   margin-top: 36px;
 }
+.hi__email {
+  margin-top: 22px;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: none;
+  color: var(--ink);
+  user-select: all;
+}
 .tape--hi-a {
   width: 140px;
   height: 32px;

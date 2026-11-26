@@ -6,7 +6,7 @@ import { sound } from './sound'
 /*  Add an email here when you are ready to show one publicly.         */
 /* ------------------------------------------------------------------ */
 
-const CONTACT_EMAIL = ''
+const CONTACT_EMAIL = 'nehhaank@gmail.com'
 const GITHUB_URL = 'https://github.com/nehhaank'
 
 type Art = 'chat' | 'tiles' | 'steps' | 'grid' | 'bars' | 'form'
@@ -980,6 +980,7 @@ function SayHi() {
             GitHub <span aria-hidden="true">↗</span>
           </a>
         </div>
+        {CONTACT_EMAIL ? <p className="hi__email stencil">{CONTACT_EMAIL}</p> : null}
       </div>
       <LostAndFound />
     </section>
