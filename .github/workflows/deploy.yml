@@ -1,7 +1,10 @@
 name: Deploy portfolio to GitHub Pages
 
-# Manual only: adding or pushing this file does not deploy the website.
+# Builds and publishes the website every time main changes.
+# It can also be started by hand from the Actions tab.
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
