@@ -20,6 +20,7 @@ export function FieldMap() {
         <circle cx="330" cy="222" r="10" className="fm-mark" />
         <path d="M312 196 A 40 40 0 0 1 356 236" className="fm-arc" />
         <circle cx="760" cy="140" r="11" className="fm-catch" />
+        <circle cx="792" cy="166" r="10" className="fm-mark" />
         <circle r="7" className="fm-disc"><animateMotion dur="2.4s" begin="indefinite" fill="freeze" path={THROW} keyPoints="0;1" keyTimes="0;1" calcMode="spline" keySplines="0.3 0 0.2 1" /></circle>
 
         <path d="M300 262 V336 H292" className="fm-lead" />

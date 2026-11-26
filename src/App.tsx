@@ -104,10 +104,10 @@ const making = [
   { id: 'books', fig: 'Shelf elevation', title: 'Fantasy, on the side', text: 'Dragons and long series. Eragon got there first.', tag: 'Always' },
 ]
 
-function Head({ id, title, note, dark, big }: { id: string; title: string; note?: string; dark?: boolean; big?: boolean }) {
+function Head({ id, title, note, dark, big, count, serif }: { id: string; title: string; note?: string; dark?: boolean; big?: boolean; count?: string; serif?: boolean }) {
   return (
-    <header className={`sh${dark ? ' on-dark' : ''}${big ? ' is-big' : ''}`} data-reveal>
-      <h2 className="sh-t" id={id}>{title}</h2>
+    <header className={`sh${dark ? ' on-dark' : ''}${big ? ' is-big' : ''}${serif ? ' is-serif' : ''}`} data-reveal>
+      <h2 className="sh-t" id={id}>{title}{count && <sup className="sh-count">{count}</sup>}</h2>
       {note && <p className="sh-note">{note}</p>}
     </header>
   )
@@ -172,6 +172,9 @@ export default function App() {
 
       <main id="main">
         <section className="hero" id="top">
+          <svg className="hero-arc" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M880 112 C 700 -14, 300 -10, -40 22" vectorEffect="non-scaling-stroke" />
+          </svg>
           <div className="hero-scene">
             <Suspense fallback={null}>
               <DiscScene />
@@ -196,10 +199,10 @@ export default function App() {
         </section>
 
         <section id="work" className="section" aria-labelledby="work-h">
-          <Head id="work-h" title="Selected work" note="Six problems from two companies. Screens are simplified sketches; full case studies are on the way." />
+          <Head big id="work-h" title="Selected work" count="(06)" note="Six problems from two companies. Screens are simplified sketches; full case studies are on the way." />
           <ol className="projects">
             {projects.map((p, i) => (
-              <li className={`pj ${i === 0 ? 'is-lead' : 'is-half'} tone-${i}`} key={p.id} data-reveal>
+              <li className={`pj ${['is-lead', 'is-wide', 'is-half', 'is-half', 'is-wide is-flip', 'is-half'][i]} tone-${i}`} key={p.id} data-reveal>
                 <Artboard id={p.id} notes={i === 0 ? p.notes : undefined} />
                 <div className="pj-body">
                   <p className="label"><span>{String(i + 1).padStart(2, '0')}</span><span>{p.company}</span></p>
@@ -215,7 +218,8 @@ export default function App() {
               <ol className="desk-list">
                 {smaller.map(([c, t, d]) => (
                   <li key={t}>
-                    <p className="d-t">{t} <span>{c}</span></p>
+                    <p className="d-t">{t}</p>
+                    <span className="d-c">{c}</span>
                     <p className="d-d">{d}</p>
                   </li>
                 ))}
@@ -224,11 +228,11 @@ export default function App() {
           </ol>
         </section>
 
-        <section className="section ways" aria-labelledby="ways-h">
-          <Head id="ways-h" title="How I work" />
+        <section className="ways" aria-labelledby="ways-h">
+          <h2 className="ways-h" id="ways-h" data-reveal>How I work</h2>
           <p className="ways-text" data-reveal>
             I like the parts of a product where configuration, journeys and states have to hold together. I think in
-            systems: roles, history, localisation, edge cases. I care about the words on the buttons, and
+            systems: roles, history, localisation, edge cases. I care about <em>the words on the buttons</em>, and
             I work closely with research and engineering to get them right.
           </p>
         </section>
@@ -258,7 +262,7 @@ export default function App() {
         </section>
 
         <section id="making" className="section making" aria-labelledby="making-h">
-          <Head id="making-h" title="Made by hand" note="Away from screens: wood, dough, and the occasional dragon." />
+          <Head serif id="making-h" title="Made by hand" note="Away from screens: wood, dough, and the occasional dragon." />
           <div className="make-grid">
             {making.map((m, i) => (
               <article className={`make make-${m.id}`} key={m.title} data-reveal>
@@ -276,7 +280,7 @@ export default function App() {
 
         <section id="hello" className="hello" aria-labelledby="hello-h">
           <div className="hello-inner">
-            <Head id="hello-h" dark title="Say hello" note="Hiring, collaborating, or stuck on a tricky flow? Email is best, and my résumé is available on request." />
+            <h2 className="hello-label" id="hello-h" data-reveal>Say hello</h2>
             <a className="hello-mail" href={`mailto:${EMAIL}`} data-reveal>
               <span>{EMAIL}</span>
             </a>
@@ -284,6 +288,7 @@ export default function App() {
               <button type="button" className="copy" onClick={copy} aria-live="polite">
                 {copied ? 'Copied ✓' : 'Copy email'}
               </button>
+              <p className="hello-note">Hiring, collaborating, or stuck on a tricky flow? Email is best, and my résumé is available on request.</p>
             </div>
             <div className="foot">
               <span>© 2026 Neha NK, product designer</span>

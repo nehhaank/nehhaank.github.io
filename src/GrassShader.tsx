@@ -27,15 +27,15 @@ const frag = /* glsl */ `
     vec3 col = mix(a, b, band);
     // blade texture: fine streaks running with the mow direction
     float blades = noise(vec2(px.x * 0.9, px.y * 0.035 + band * 40.0));
-    col *= 0.96 + 0.06 * blades;
+    col *= 0.985 + 0.02 * blades;
     // slow cloud shadow
     float cloud = noise(vUv * vec2(1.6, 1.0) * 1.2 + vec2(uTime * 0.025, uTime * 0.008));
-    col *= 0.93 + 0.1 * smoothstep(0.3, 0.8, cloud);
+    col *= 0.96 + 0.05 * smoothstep(0.3, 0.8, cloud);
     // pointer light
     float aspect = uRes.x / uRes.y;
     vec2 d = (vUv - uMouse) * vec2(aspect, 1.0);
     col += vec3(0.95, 0.82, 0.3) * 0.07 * exp(-dot(d, d) * 6.0);
-    col += (hash(px + uTime) - 0.5) * 0.018;
+    col += (hash(px + uTime) - 0.5) * 0.008;
     col *= edge * 0.04 + 0.96;
     gl_FragColor = vec4(col, 1.0);
   }

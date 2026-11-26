@@ -146,7 +146,8 @@ export function Artboard({ id, notes = [] }: { id: string; notes?: string[] }) {
       const fit = () => {
         const cs = getComputedStyle(f)
         const inner = f.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
-        setS(Math.min(1.5, inner / 404))
+        const frac = parseFloat(cs.getPropertyValue('--fit')) || 1
+        setS(Math.min(1.6, (inner * frac) / 404))
       }
       fit()
       const ro = new ResizeObserver(fit)
