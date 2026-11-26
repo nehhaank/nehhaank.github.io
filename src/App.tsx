@@ -288,19 +288,14 @@ function ProjectArt({ art }: { art: Art }) {
               <p>Walk me through a tricky bug you fixed recently.</p>
             </div>
             <div className="msg msg--me">
-              <p>
-                <i style={{ width: '92%' }} />
-                <i style={{ width: '64%' }} />
-              </p>
+              <p>A timer kept resetting on refresh, so I traced where the state lived.</p>
             </div>
             <div className="msg msg--ai">
               <span className="avatar">AI</span>
               <p>What would you check first next time?</p>
             </div>
             <div className="msg msg--me">
-              <p>
-                <i style={{ width: '80%' }} />
-              </p>
+              <p>The network tab, before touching any code.</p>
             </div>
           </div>
           <div className="ui__foot">
@@ -420,6 +415,7 @@ function Feature({ p, i }: { p: (typeof projects)[number]; i: number }) {
   return (
     <li className={`feature ${i % 2 ? 'feature--flip' : ''}`} data-reveal>
       <div className="feature__sheet">
+        <span className="feature__pin" aria-hidden="true" />
         <div className="project__screen feature__screen">
           <ProjectArt art={p.art} />
         </div>
@@ -431,7 +427,6 @@ function Feature({ p, i }: { p: (typeof projects)[number]; i: number }) {
         </p>
         <h3 className="feature__title">{p.title}</h3>
         <p className="feature__note">{p.note}</p>
-        <p className="feature__soon">Case study in progress</p>
       </div>
     </li>
   )
@@ -782,32 +777,36 @@ function Field({ reduced }: { reduced: boolean }) {
           </div>
         </div>
 
-        <ul className="cards">
-          <li className="card paper" data-reveal>
-            <span className="card__k">Since Oct 2026</span>
-            <p>
-              <strong>Captain</strong> at Learning to Fly (L2F), Bengaluru
-            </p>
-          </li>
-          <li className="card paper" data-reveal style={{ '--d': '70ms' } as CSSProperties}>
-            <span className="card__k">Oct 2026</span>
-            <p>
-              Played the <strong>Pan-Asia</strong> tournament in Hong Kong
-            </p>
-          </li>
-          <li className="card paper" data-reveal style={{ '--d': '140ms' } as CSSProperties}>
-            <span className="card__k">Coaching</span>
-            <p>
-              <strong>Level 1 coaching.</strong> I plan drills for short throws, break-marks and resets
-            </p>
-          </li>
-          <li className="card paper" data-reveal style={{ '--d': '210ms' } as CSSProperties}>
-            <span className="card__k">Training</span>
-            <p>
-              Track <strong>sprints</strong> three times a week, plus the gym
-            </p>
-          </li>
-          <li className="card paper card--kit" data-reveal style={{ '--d': '280ms' } as CSSProperties}>
+        <div className="scorecard paper" data-reveal>
+          <p className="scorecard__head">
+            <span>Player card</span>
+            <span>L2F · Bengaluru</span>
+          </p>
+          <dl className="scorecard__rows">
+            <div>
+              <dt>Role</dt>
+              <dd>
+                <strong>Captain</strong>, since Oct 2026
+              </dd>
+            </div>
+            <div>
+              <dt>Away</dt>
+              <dd>
+                <strong>Pan-Asia</strong>, Hong Kong, Oct 2026
+              </dd>
+            </div>
+            <div>
+              <dt>Coaching</dt>
+              <dd>
+                <strong>Level 1.</strong> Drills for short throws, break-marks and resets
+              </dd>
+            </div>
+            <div>
+              <dt>Training</dt>
+              <dd>Track sprints three times a week, plus the gym</dd>
+            </div>
+          </dl>
+          <div className="scorecard__kit">
             <span className="swatch" aria-hidden="true">
               <svg viewBox="0 0 80 80">
                 <g className="swatch__map">
@@ -821,12 +820,12 @@ function Field({ reduced }: { reduced: boolean }) {
                 </g>
               </svg>
             </span>
-            <span className="card__k">Side project</span>
             <p>
+              <span className="card__k">Side project</span>
               <strong>Kit concepts</strong> for the Hong Kong trip: ivory, gold street-map lines, a red flower
             </p>
-          </li>
-        </ul>
+          </div>
+        </div>
       </div>
 
     </section>
@@ -945,7 +944,6 @@ function Making() {
 
 const nowNotes = [
   { k: 'Leading', t: 'captaining L2F' },
-  { k: 'Training', t: 'sprints, three times a week' },
   { k: 'Building', t: 'a four-poster cot' },
   { k: 'Writing', t: 'case studies for this site' },
 ]
@@ -992,9 +990,6 @@ function SayHi() {
           <span aria-hidden="true">↗</span>
         </a>
         <div className="closing__links" data-reveal>
-          <a className="btn btn--light" href={`mailto:${CONTACT_EMAIL}`} onClick={() => sound.tap()}>
-            Write to me
-          </a>
           <a className="btn btn--line" href={GITHUB_URL} target="_blank" rel="noreferrer" onClick={() => sound.tap()}>
             GitHub <span aria-hidden="true">↗</span>
           </a>
