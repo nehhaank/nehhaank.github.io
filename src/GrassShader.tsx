@@ -23,7 +23,7 @@ const frag = /* glsl */ `
     float band = mod(floor(px.x / 160.0), 2.0);
     float edge = smoothstep(0.0, 2.0, abs(mod(px.x, 160.0) - 0.0));
     vec3 a = vec3(0.114, 0.275, 0.188);
-    vec3 b = vec3(0.133, 0.310, 0.212);
+    vec3 b = vec3(0.124, 0.292, 0.200);
     vec3 col = mix(a, b, band);
     // blade texture: fine streaks running with the mow direction
     float blades = noise(vec2(px.x * 0.9, px.y * 0.035 + band * 40.0));

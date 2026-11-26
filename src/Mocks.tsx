@@ -4,9 +4,27 @@ import { useLayoutEffect, useRef, useState } from 'react'
 // They are illustrations built for this site, not product screenshots, and show no real data.
 // Each sits on an "artboard" with redline notes that point at the decision it illustrates.
 
+function Bar({ crumb }: { crumb: string }) {
+  return (
+    <div className="mk-bar" aria-hidden="true">
+      <i className="mk-logo" />
+      <span>{crumb}</span>
+    </div>
+  )
+}
+
+function Cursor() {
+  return (
+    <svg className="mk-cursor" viewBox="0 0 16 22" aria-hidden="true">
+      <path d="M1 1 L1 17 L5.5 13 L8.5 20 L11 19 L8 12 L14 12 Z" />
+    </svg>
+  )
+}
+
 function Interviewer() {
   return (
     <div className="mk-ui">
+      <Bar crumb="Interview settings" />
       <p className="mk-h" data-n="1">Choose an interview mode</p>
       <div className="mk-two">
         <div className="mk-opt">
@@ -17,6 +35,7 @@ function Interviewer() {
           </ol>
         </div>
         <div className="mk-opt is-on">
+          <Cursor />
           <b>Adaptive</b>
           <span>Goes deeper when an answer is thin.</span>
           <svg viewBox="0 0 160 64" className="mk-tree" aria-hidden="true" data-n="2">
@@ -33,6 +52,7 @@ function Interviewer() {
 function Multilingual() {
   return (
     <div className="mk-ui">
+      <Bar crumb="Assessment · English → Español" />
       <div className="mk-row">
         <span className="mk-note">Question 3 of 12</span>
         <span className="mk-sel" data-n="1">Español ▾</span>
@@ -51,6 +71,7 @@ function Multilingual() {
 function Registration() {
   return (
     <div className="mk-ui">
+      <Bar crumb="Candidate registration" />
       <p className="mk-h">Two quick details and you’re in.</p>
       <label className="mk-field" data-n="1"><span>Full name</span><i>Your name</i></label>
       <label className="mk-field"><span>Email</span><i>you@example.com</i></label>
@@ -64,6 +85,7 @@ function Onboarding() {
   const steps = ['Explore', 'Apply', 'Verify', 'Assess', 'Ready']
   return (
     <div className="mk-ui">
+      <Bar crumb="Your application" />
       <ol className="mk-status" data-n="1">
         {steps.map((s, i) => (
           <li key={s} className={i < 3 ? 'done' : i === 3 ? 'now' : ''}><i />{s}</li>
@@ -83,6 +105,7 @@ function Planner() {
   const rows = ['Design', 'Research', 'Ops', 'QA']
   return (
     <div className="mk-ui">
+      <Bar crumb="Capacity · Next 6 weeks" />
       <div className="mk-seg" data-n="1"><span className="is-on">Profile</span><span>Work type</span><span>Cohort</span></div>
       <div className="mk-grid">
         <span />
@@ -91,7 +114,9 @@ function Planner() {
           <div className="mk-grow" key={r}>
             <span className="mk-rowh">{r}</span>
             {Array.from({ length: 6 }).map((_, c) => (
-              <i key={c} className={on.has(`${ri}-${c}`) ? 'on' : ri === 2 && c === 4 ? 'y' : ''} data-n={ri === 2 && c === 4 ? '2' : undefined} />
+              <i key={c} className={on.has(`${ri}-${c}`) ? 'on' : ri === 2 && c === 4 ? 'y' : ''} data-n={ri === 2 && c === 4 ? '2' : undefined}>
+                {ri === 2 && c === 4 && <Cursor />}
+              </i>
             ))}
           </div>
         ))}
@@ -103,6 +128,7 @@ function Planner() {
 function Savings() {
   return (
     <div className="mk-ui">
+      <Bar crumb="Reports · Savings" />
       <div className="mk-row"><p className="mk-h">Estimated savings</p><span className="mk-seg small"><span className="is-on">Quarter</span><span>Year</span></span></div>
       <div className="mk-compare" data-n="1">
         <div><span>Without the tool</span><i style={{ width: '92%' }} /></div>
@@ -130,28 +156,43 @@ const PIN_X = 432
 
 type Pin = { tx: number; x: number; y: number; ny: number }
 
-export function Artboard({ id, notes = [] }: { id: string; notes?: string[] }) {
+export function Artboard({ id, notes = [], fit = false }: { id: string; notes?: string[]; fit?: boolean }) {
   const frame = useRef<HTMLDivElement>(null)
   const stage = useRef<HTMLDivElement>(null)
   const [s, setS] = useState(1)
   const [pins, setPins] = useState<Pin[]>([])
   const M = MAP[id]
 
-  const bleed = notes.length === 0
+  const bleed = fit || notes.length === 0
   useLayoutEffect(() => {
     const f = frame.current
     const st = stage.current
     if (!f || !st) return
     if (bleed) {
-      const fit = () => {
+      // The screen is zoomed to fill its block; pins sit on the screen, the notes are listed beside it.
+      const fitIt = () => {
         const cs = getComputedStyle(f)
         const inner = f.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight)
         const frac = parseFloat(cs.getPropertyValue('--fit')) || 1
-        setS(Math.min(1.6, (inner * frac) / 404))
+        const z = Math.min(2.4, (inner * frac) / 404)
+        setS(z)
+        requestAnimationFrame(() => {
+          const base = st.getBoundingClientRect()
+          const k = base.width / 404 || 1
+          setPins(
+            notes.map((_, i) => {
+              const el = st.querySelector<HTMLElement>(`[data-n="${i + 1}"]`)
+              if (!el) return { tx: 0, x: 0, y: 0, ny: 0 }
+              const r = el.getBoundingClientRect()
+              return { tx: 0, x: (r.right - base.left) / k + 3, y: (r.top - base.top) / k + 1, ny: 0 }
+            }),
+          )
+        })
       }
-      fit()
-      const ro = new ResizeObserver(fit)
+      fitIt()
+      const ro = new ResizeObserver(fitIt)
       ro.observe(f)
+      document.fonts?.ready.then(fitIt)
       return () => ro.disconnect()
     }
     const measure = () => {
@@ -182,7 +223,12 @@ export function Artboard({ id, notes = [] }: { id: string; notes?: string[] }) {
   if (bleed) {
     return (
       <div className="ab is-fit" ref={frame}>
-        <div className="ab-fit" ref={stage} style={{ zoom: s }}><M /></div>
+        <div className="ab-fit" ref={stage} style={{ zoom: s }}>
+          <M />
+          {pins.map((p, i) => (
+            <span key={i} className="ab-pin is-on" style={{ left: p.x, top: p.y, scale: String(1 / Math.max(s, 1) * 1.15) }}>{i + 1}</span>
+          ))}
+        </div>
       </div>
     )
   }
