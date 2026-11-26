@@ -1,8 +1,18 @@
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode, type PointerEvent as ReactPointerEvent } from 'react'
 import { sound } from './sound'
 import blockN from './assets/obj/blockN.webp'
 import blockK from './assets/obj/blockK.webp'
 import cotImg from './assets/obj/cot.webp'
+import shelfImg from './assets/obj/shelf.webp'
+import booksImg from './assets/obj/books.webp'
+import lineImg from './assets/obj/line.webp'
+import bake0 from './assets/obj/bake0.webp'
+import bake1 from './assets/obj/bake1.webp'
+import bake2 from './assets/obj/bake2.webp'
+import bake3 from './assets/obj/bake3.webp'
+import plateImg from './assets/obj/plate.webp'
+import trayImg from './assets/obj/tray.webp'
+import hiBoard from './assets/obj/hiboard.webp'
 import pegA from './assets/obj/pegA.webp'
 import pegB from './assets/obj/pegB.webp'
 import token22 from './assets/obj/token22.webp'
@@ -32,14 +42,14 @@ const projects: { title: string; where: string; art: Art; note: string; featured
 const smallThings = ['Report integrity', 'Proctoring status language', 'Section timers', 'Answer explanations', 'Listening questions', 'Readable graphs', 'Retake wording']
 
 const tokens: { label: string; img: string; w: number; dark?: boolean; r: number }[] = [
-  { label: 'Complex workflows', img: token38, w: 974, r: -3 },
-  { label: 'Systems thinking', img: token38w, w: 974, dark: true, r: 2 },
-  { label: 'AI interactions', img: token38, w: 974, r: 4 },
-  { label: 'Edge cases', img: token30w, w: 861, dark: true, r: -2 },
-  { label: 'UX writing', img: token30, w: 861, r: 3 },
-  { label: 'Data viz', img: token22, w: 740, r: -4 },
+  { label: 'Complex workflows', img: token38, w: 974, r: -1 },
+  { label: 'Edge cases', img: token30w, w: 861, dark: true, r: 1.5 },
+  { label: 'Data viz', img: token22, w: 740, r: -0.5 },
+  { label: 'Systems thinking', img: token38w, w: 974, dark: true, r: 0.8 },
+  { label: 'UX writing', img: token30, w: 861, r: -1.2 },
   { label: 'Research', img: token22, w: 740, r: 1 },
-  { label: 'Prototyping', img: token30, w: 861, r: -1 },
+  { label: 'AI interactions', img: token38, w: 974, r: 0.6 },
+  { label: 'Prototyping', img: token30, w: 861, r: -0.8 },
 ]
 
 
@@ -117,14 +127,11 @@ function Tape({ className = '' }: { className?: string }) {
   return <span className={`tape ${className}`} aria-hidden="true" />
 }
 
-function ShippingLabel({ n, children }: { n: number; children: string }) {
+function Kicker({ n, children }: { n: number; children: string }) {
   return (
-    <p className="ship" data-reveal>
-      <span className="ship__no">box {String(n).padStart(2, '0')}</span>
-      <span className="ship__name">{children}</span>
-      <span className="ship__arrow" aria-hidden="true">
-        ↑↑ this side up
-      </span>
+    <p className="kicker" data-reveal>
+      <span>{String(n).padStart(2, '0')}</span>
+      {children}
     </p>
   )
 }
@@ -177,9 +184,15 @@ function Hero({ reduced }: { reduced: boolean }) {
         </p>
         <h1 id="hero-title" data-reveal>
           Hi, I’m{' '}
-          <span className="tape-word">
+          <span className="hl">
             Neha
-            <Tape className="tape--word" />
+            <svg className="hl__stroke" viewBox="0 0 300 60" preserveAspectRatio="none" aria-hidden="true">
+              <filter id="hl-rough" x="-5%" y="-30%" width="110%" height="160%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.02 0.3" numOctaves="2" seed="4" />
+                <feDisplacementMap in="SourceGraphic" scale="9" />
+              </filter>
+              <path filter="url(#hl-rough)" d="M8 22 C 70 16, 160 14, 292 18 L 290 50 C 200 47, 100 52, 10 54 Z" />
+            </svg>
           </span>
           .
         </h1>
@@ -255,77 +268,173 @@ function Hero({ reduced }: { reduced: boolean }) {
 /*  Work                                                               */
 /* ------------------------------------------------------------------ */
 
+/** Small, believable UI sketches. Text is placeholder-level and never claims outcomes. */
 function ProjectArt({ art }: { art: Art }) {
   switch (art) {
     case 'chat':
       return (
-        <div className="art art--chat">
-          <span className="sk sk--bubble" />
-          <span className="sk sk--bubble sk--me" />
-          <span className="sk sk--bubble sk--short" />
-          <span className="wave">
-            {[6, 14, 22, 12, 18, 8, 16, 10, 20, 9].map((h, i) => (
-              <i key={i} style={{ height: h }} />
-            ))}
-          </span>
-          <span className="sk sk--input">
-            <i />
-          </span>
+        <div className="ui ui--chat">
+          <div className="ui__bar">
+            <span className="ui__dot" />
+            <b>AI interview</b>
+            <span className="ui__seg">
+              <i className="is-on">Structured</i>
+              <i>Adaptive</i>
+            </span>
+          </div>
+          <div className="ui__body">
+            <div className="msg msg--ai">
+              <span className="avatar">AI</span>
+              <p>Walk me through a tricky bug you fixed recently.</p>
+            </div>
+            <div className="msg msg--me">
+              <p>
+                <i style={{ width: '92%' }} />
+                <i style={{ width: '64%' }} />
+              </p>
+            </div>
+            <div className="msg msg--ai">
+              <span className="avatar">AI</span>
+              <p>What would you check first next time?</p>
+            </div>
+            <div className="msg msg--me">
+              <p>
+                <i style={{ width: '80%' }} />
+              </p>
+            </div>
+          </div>
+          <div className="ui__foot">
+            <span className="wave">
+              {[6, 12, 18, 10, 15, 7, 13, 9, 16, 8, 11, 5].map((h, i) => (
+                <i key={i} style={{ height: h }} />
+              ))}
+            </span>
+            <span className="ui__rec">Listening</span>
+          </div>
         </div>
       )
     case 'tiles':
       return (
-        <div className="art art--tiles">
-          {['Aa', 'अ', 'ಕ', '文', 'Ñ', 'ع'].map((t, i) => (
-            <span key={t} className={`letter-tile wood ${i % 2 ? 'wood--walnut' : ''}`} style={{ '--r': `${(i % 3) * 3 - 3}deg` } as CSSProperties}>
-              {t}
-            </span>
-          ))}
+        <div className="ui ui--lang">
+          <div className="ui__bar">
+            <span className="ui__dot" />
+            <b>Choose your test language</b>
+          </div>
+          <div className="ui__body lang">
+            {[
+              ['English', 'Aa'],
+              ['हिन्दी', 'अ'],
+              ['ಕನ್ನಡ', 'ಕ'],
+              ['中文', '文'],
+              ['Español', 'Ñ'],
+              ['العربية', 'ع'],
+            ].map(([name, glyph], i) => (
+              <span key={name} className={`lang__opt ${i === 2 ? 'is-on' : ''}`}>
+                <span className="lang__g">{glyph}</span>
+                {name}
+              </span>
+            ))}
+          </div>
+          <div className="ui__foot">
+            <span className="ui__note">You can switch during the test</span>
+            <span className="ui__btn">Continue</span>
+          </div>
         </div>
       )
     case 'steps':
       return (
-        <div className="art art--steps">
-          {[1, 2, 3].map(n => (
-            <span key={n} className={`step ${n === 3 ? 'is-now' : ''}`}>
-              <b>{n}</b>
-              <i />
-            </span>
-          ))}
+        <div className="ui ui--steps">
+          <div className="stepper">
+            {['Details', 'Check', 'Ready'].map((t, i) => (
+              <span key={t} className={`stepper__s ${i < 2 ? 'is-done' : ''} ${i === 2 ? 'is-now' : ''}`}>
+                <b>{i < 2 ? '✓' : 3}</b>
+                {t}
+              </span>
+            ))}
+          </div>
+          <div className="ui__field">
+            <i style={{ width: '38%' }} />
+          </div>
+          <div className="ui__field">
+            <i style={{ width: '56%' }} />
+          </div>
+          <span className="ui__btn ui__btn--wide">Start test</span>
         </div>
       )
     case 'grid':
       return (
-        <div className="art art--grid">
-          {Array.from({ length: 15 }, (_, i) => (
-            <span key={i} className={`cell ${[2, 6, 7, 11].includes(i) ? 'is-on' : ''}`} />
-          ))}
+        <div className="ui ui--grid">
+          <div className="ui__tabs">
+            <i className="is-on">Profile</i>
+            <i>Work type</i>
+            <i>Cohort</i>
+          </div>
+          <div className="heat">
+            {[1, 2, 3, 1, 0, 2, 3, 3, 2, 1, 0, 1, 2, 3, 2, 1, 1, 0, 1, 2].map((v, i) => (
+              <span key={i} className={`heat__c v${v}`} />
+            ))}
+          </div>
         </div>
       )
     case 'bars':
       return (
-        <div className="art art--bars">
-          <span className="sk sk--big" />
+        <div className="ui ui--bars">
+          <div className="kpi">
+            <span>Modeled savings</span>
+            <b />
+            <em>Show the math</em>
+          </div>
           <div className="bars">
-            {[38, 56, 44, 72, 64].map((h, i) => (
-              <i key={i} className={i === 3 ? 'is-on' : ''} style={{ height: `${h}%` }} />
+            {[38, 52, 46, 70, 62, 80].map((h, i) => (
+              <i key={i} className={i === 5 ? 'is-on' : ''} style={{ height: `${h}%` }} />
             ))}
+          </div>
+          <div className="legend">
+            <span>
+              <i className="is-on" />
+              Modeled
+            </span>
+            <span>
+              <i />
+              Baseline
+            </span>
           </div>
         </div>
       )
     case 'form':
       return (
-        <div className="art art--form">
-          {[true, true, false].map((done, i) => (
-            <div key={i} className="form-row">
-              <span className={`check ${done ? 'is-done' : ''}`} />
-              <span className="field-line" />
+        <div className="ui ui--form">
+          {['Browse roles', 'Apply', 'Sign up', 'Inline assessment'].map((t, i) => (
+            <div key={t} className={`path ${i < 2 ? 'is-done' : ''} ${i === 2 ? 'is-now' : ''}`}>
+              <span className="path__dot" />
+              {t}
             </div>
           ))}
-          <span className="sk sk--btn" />
+          <span className="ui__later">Save and finish later</span>
         </div>
       )
   }
+}
+
+function Feature({ p, i }: { p: (typeof projects)[number]; i: number }) {
+  return (
+    <li className={`feature ${i % 2 ? 'feature--flip' : ''}`} data-reveal>
+      <div className="feature__sheet">
+        <div className="project__screen feature__screen">
+          <ProjectArt art={p.art} />
+        </div>
+      </div>
+      <div className="feature__text">
+        <p className="feature__where">
+          <span>{String(i + 1).padStart(2, '0')}</span>
+          {p.where}
+        </p>
+        <h3 className="feature__title">{p.title}</h3>
+        <p className="feature__note">{p.note}</p>
+        <p className="feature__soon">Case study in progress</p>
+      </div>
+    </li>
+  )
 }
 
 function ProjectCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
@@ -342,8 +451,8 @@ function ProjectCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
           sound.tap()
         }}
       >
-        <span className="project__face project__front cardboard">
-          <span className="project__screen paper">
+        <span className="project__face project__front">
+          <span className="project__screen">
             <ProjectArt art={p.art} />
           </span>
           <span className="project__meta">
@@ -351,10 +460,10 @@ function ProjectCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
             <span className="project__where">{p.where}</span>
           </span>
           <span className="project__turn" aria-hidden="true">
-            ↻
+            Flip ↻
           </span>
         </span>
-        <span className="project__face project__back cardboard cardboard--inside" aria-hidden={!flipped}>
+        <span className="project__face project__back" aria-hidden={!flipped}>
           <span className="project__note">{p.note}</span>
           <span className="project__soon">Full story being written</span>
         </span>
@@ -365,33 +474,58 @@ function ProjectCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
 
 function Work() {
   return (
-    <section id="work" className="section" aria-labelledby="work-title">
-      <ShippingLabel n={1}>work</ShippingLabel>
-      <div className="section__head">
-        <h2 id="work-title" data-reveal>
-          Prototypes from my desk
-        </h2>
-        <p className="section__aside" data-reveal>
-          Six projects from WeCP and Invisible Technologies. Tap a card to turn it over.
-        </p>
-      </div>
-      <ul className="projects">
-        {projects.map((p, i) => (
-          <ProjectCard key={p.title} p={p} i={i} />
-        ))}
-      </ul>
-      <div className="drawer" data-reveal>
-        <div className="drawer__front wood wood--walnut">
-          <span className="drawer__pull" aria-hidden="true" />
-          <p className="drawer__label">and a drawer of smaller fixes</p>
-        </div>
-        <ul className="drawer__tags">
-          {smallThings.map((s, i) => (
-            <li key={s} className="label-tape" style={{ '--r': `${((i * 7) % 5) - 2}deg` } as CSSProperties}>
-              {s}
-            </li>
+    <section id="work" className="mat-wrap" aria-labelledby="work-title">
+      <div className="mat">
+        <span className="mat__ruler" aria-hidden="true">
+          {Array.from({ length: 9 }, (_, i) => (
+            <b key={i} style={{ left: i * 160 }}>
+              {i * 5}
+            </b>
           ))}
-        </ul>
+        </span>
+        <span className="mat__ruler mat__ruler--side" aria-hidden="true">
+          {Array.from({ length: 12 }, (_, i) => (
+            <b key={i} style={{ top: i * 160 }}>
+              {i * 5}
+            </b>
+          ))}
+        </span>
+        <span className="mat__print" aria-hidden="true">
+          Self-healing · 5 mm grid
+        </span>
+        <div className="mat__inner">
+          <Kicker n={1}>Work</Kicker>
+          <div className="section__head">
+            <h2 id="work-title" data-reveal>
+              Prototypes from my desk
+            </h2>
+            <p className="section__aside" data-reveal>
+              Selected work from WeCP and Invisible Technologies.
+            </p>
+          </div>
+          <ul className="features">
+            {projects
+              .filter(p => p.featured)
+              .map((p, i) => (
+                <Feature key={p.title} p={p} i={i} />
+              ))}
+          </ul>
+          <ul className="projects">
+            {projects
+              .filter(p => !p.featured)
+              .map((p, i) => (
+                <ProjectCard key={p.title} p={p} i={i} />
+              ))}
+          </ul>
+          <div className="also" data-reveal>
+            <p className="also__k">Also shipped</p>
+            <ul className="also__list">
+              {smallThings.map(s => (
+                <li key={s}>{s}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   )
@@ -423,11 +557,11 @@ function Token({ t, i }: { t: (typeof tokens)[number]; i: number }) {
   }
 
   return (
-    <li className="token-slot" data-reveal style={{ '--d': `${i * 50}ms` } as CSSProperties}>
+    <li className="token-slot" data-reveal style={{ '--d': `${i * 50}ms`, '--w': t.w / 974 } as CSSProperties}>
       <button
         type="button"
         className={`token ${t.dark ? 'token--dark' : ''} ${dragging ? 'is-dragging' : ''}`}
-        style={{ '--x': `${pos.x}px`, '--y': `${pos.y}px`, '--r': `${t.r}deg`, width: Math.round(t.w * 0.25) } as CSSProperties}
+        style={{ '--x': `${pos.x}px`, '--y': `${pos.y}px`, '--r': `${t.r}deg` } as CSSProperties}
         onPointerDown={down}
         onPointerMove={move}
         onPointerUp={up}
@@ -457,15 +591,18 @@ function How() {
           <p data-reveal>
             I work closely with product, engineering and research, and I like owning the messy middle: the states, the edge cases and the words on the buttons.
           </p>
-          <p className="marker how__hint" data-reveal>
-            the tokens slide, try one
+          <p className="how__hint" data-reveal>
+            The pieces in the tray slide around. Try one.
           </p>
         </div>
-        <ul className="tokens">
-          {tokens.map((t, i) => (
-            <Token key={t.label} t={t} i={i} />
-          ))}
-        </ul>
+        <div className="tray-wrap" data-reveal>
+          <img className="tray-img" src={trayImg} alt="" width={1240} height={780} draggable={false} />
+          <ul className="tokens">
+            {tokens.map((t, i) => (
+              <Token key={t.label} t={t} i={i} />
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   )
@@ -593,13 +730,13 @@ function Field({ reduced }: { reduced: boolean }) {
 
   return (
     <section id="field" className="section" aria-labelledby="field-title">
-      <ShippingLabel n={2}>on the field</ShippingLabel>
-      <div className="section__head">
+      <Kicker n={2}>On the field</Kicker>
+      <div className="section__head section__head--split">
         <h2 id="field-title" data-reveal>
           Weekends are for Ultimate frisbee
         </h2>
         <p className="section__aside" data-reveal>
-          {reduced ? 'Press the disc to score a point.' : 'Grab the disc and fling it into the end zone.'}
+          Captain and Level 1 coach at Learning to Fly, Bengaluru.
         </p>
       </div>
 
@@ -636,6 +773,9 @@ function Field({ reduced }: { reduced: boolean }) {
             <p className={`pitch__cheer marker ${cheer ? 'is-on' : ''}`} aria-live="polite">
               {cheer ? 'point!' : ''}
             </p>
+            <p className="pitch__hint">{reduced ? 'Press the disc to score' : 'Drag the disc, then let go'}</p>
+            <span className="brick brick--l" aria-hidden="true" />
+            <span className="brick brick--r" aria-hidden="true" />
             <p className="pitch__score">
               Points <b>{points}</b>
             </p>
@@ -667,48 +807,28 @@ function Field({ reduced }: { reduced: boolean }) {
               Track <strong>sprints</strong> three times a week, plus the gym
             </p>
           </li>
+          <li className="card paper card--kit" data-reveal style={{ '--d': '280ms' } as CSSProperties}>
+            <span className="swatch" aria-hidden="true">
+              <svg viewBox="0 0 80 80">
+                <g className="swatch__map">
+                  <path d="M-4 22 L40 46 L84 30 M10 84 L34 40 L28 -4 M58 84 L50 50 L84 58 M-4 60 L44 56 L70 -4" />
+                </g>
+                <g className="swatch__flower" transform="translate(54 58)">
+                  {[0, 72, 144, 216, 288].map(a => (
+                    <ellipse key={a} rx="5" ry="9" transform={`rotate(${a}) translate(0 -7)`} />
+                  ))}
+                  <circle r="3.2" />
+                </g>
+              </svg>
+            </span>
+            <span className="card__k">Side project</span>
+            <p>
+              <strong>Kit concepts</strong> for the Hong Kong trip: ivory, gold street-map lines, a red flower
+            </p>
+          </li>
         </ul>
       </div>
 
-      <div className="kit" data-reveal>
-        <div className="kit__jersey">
-          <svg viewBox="0 0 220 220" role="img" aria-label="A cut-out of an ivory jersey with gold street-map lines and a red flower">
-            <defs>
-              <clipPath id="jersey-shape">
-                <path d="M70 18 Q110 40 150 18 L198 44 L182 92 L160 84 L162 204 L58 204 L60 84 L38 92 L22 44 Z" />
-              </clipPath>
-              <filter id="paperish">
-                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n" />
-                <feColorMatrix in="n" values="0 0 0 0 0.4  0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0.12 0" result="g" />
-                <feComposite in="g" in2="SourceGraphic" operator="in" result="gi" />
-                <feMerge>
-                  <feMergeNode in="SourceGraphic" />
-                  <feMergeNode in="gi" />
-                </feMerge>
-              </filter>
-            </defs>
-            <path className="kit__board" d="M74 23 Q114 45 154 23 L203 49 L187 97 L165 89 L167 209 L63 209 L65 89 L43 97 L27 49 Z" />
-            <g filter="url(#paperish)">
-              <path className="kit__base" d="M70 18 Q110 40 150 18 L198 44 L182 92 L160 84 L162 204 L58 204 L60 84 L38 92 L22 44 Z" />
-            </g>
-            <g clipPath="url(#jersey-shape)" className="kit__map">
-              <path d="M40 60 L120 120 L200 90 M60 200 L100 110 L90 40 M150 210 L130 130 L190 150 M20 140 L110 150 L170 60" />
-              <path d="M70 170 Q 100 160 140 180 M80 70 Q 120 90 160 70" />
-            </g>
-            <g className="kit__flower" transform="translate(132 150)">
-              {[0, 72, 144, 216, 288].map(a => (
-                <ellipse key={a} rx="9" ry="17" transform={`rotate(${a}) translate(0 -13)`} />
-              ))}
-              <circle r="6" className="kit__flower-c" />
-            </g>
-            <path className="kit__collar" d="M70 18 Q110 40 150 18" />
-          </svg>
-        </div>
-        <div className="kit__text">
-          <span className="card__k">Side project</span>
-          <p>Kit concepts for L2F’s Hong Kong trip: an ivory base, fine gold street-map lines and a red flower.</p>
-        </div>
-      </div>
     </section>
   )
 }
@@ -717,23 +837,45 @@ function Field({ reduced }: { reduced: boolean }) {
 /*  Made by hand                                                       */
 /* ------------------------------------------------------------------ */
 
-function Bakeable({ kind, label }: { kind: 'cookie' | 'brownie' | 'focaccia'; label: string }) {
+const bakes = [bake0, bake1, bake2, bake3]
+
+function BakeBoard() {
   const [bites, setBites] = useState(0)
+  useEffect(() => {
+    bakes.forEach(src => {
+      const im = new Image()
+      im.src = src
+    })
+  }, [])
   return (
     <button
       type="button"
-      className={`bake bake--${kind} bites-${bites}`}
-      aria-label={`${label}. ${bites === 3 ? 'All gone. Press to bake another.' : 'Press to take a bite.'}`}
+      className="bakeboard"
+      aria-label={bites === 3 ? 'A board of cookie, brownie and focaccia, all bitten. Press to bake a fresh batch.' : 'A board with a cookie, a brownie and focaccia. Press to take a bite.'}
       onClick={() => {
         sound.squish()
         setBites(b => (b + 1) % 4)
       }}
     >
-      <span className={`bake__body clay clay--${kind}`}>
-        {kind === 'cookie' && [0, 1, 2, 3, 4].map(i => <i key={i} />)}
-        {kind === 'focaccia' && [0, 1, 2, 3, 4, 5].map(i => <i key={i} />)}
-      </span>
+      <img src={bakes[bites]} alt="" width={860} height={239} draggable={false} />
     </button>
+  )
+}
+
+function Shelf({ items, labels }: { items: ReactNode; labels: [string, string][] }) {
+  return (
+    <div className="shelf" data-reveal>
+      <div className="shelf__items">{items}</div>
+      <img className="shelf__plank" src={shelfImg} alt="" width={2300} height={289} draggable={false} />
+      <div className="shelf__labels">
+        {labels.map(([name, meta]) => (
+          <p key={name}>
+            <span className="item__name">{name}</span>
+            <span className="item__meta">{meta}</span>
+          </p>
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -741,93 +883,57 @@ function Making() {
   const [wobble, setWobble] = useState(0)
   return (
     <section id="making" className="section" aria-labelledby="making-title">
-      <ShippingLabel n={3}>made by hand</ShippingLabel>
-      <div className="section__head">
+      <Kicker n={3}>Made by hand</Kicker>
+      <div className="section__head section__head--big">
         <h2 id="making-title" data-reveal>
           I like making real things too
         </h2>
-        <p className="section__aside" data-reveal>
-          Woodwork, baking and small experiments. The cookie is edible, sort of.
-        </p>
       </div>
 
-      <div className="shelf-unit">
-        <div className="shelf" data-reveal>
-          <div className="shelf__items">
-            <figure className="item item--cot">
-              <button
-                type="button"
-                key={wobble}
-                className={`cot ${wobble ? 'is-wobbling' : ''}`}
-                aria-label="A small wooden four-poster cot. Press to give it a nudge."
-                onClick={() => {
-                  sound.tok()
-                  setWobble(w => w + 1)
-                }}
-              >
-                <img src={cotImg} alt="" width={909} height={691} draggable={false} />
-              </button>
-              <figcaption>
-                <span className="item__name">Four-poster cot</span>
-                <span className="item__meta">in progress, with a mentor</span>
-              </figcaption>
-            </figure>
-
-            <figure className="item item--tray">
-              <div className="tray wood wood--walnut">
-                <Bakeable kind="cookie" label="Chocolate-chip cookie" />
-                <Bakeable kind="brownie" label="Brownie" />
-                <Bakeable kind="focaccia" label="Focaccia" />
-              </div>
-              <figcaption>
-                <span className="item__name">Cookies, brownies, focaccia, apple pie</span>
-                <span className="item__meta">still testing substitutions</span>
-              </figcaption>
-            </figure>
-          </div>
-          <div className="shelf__plank wood" aria-hidden="true" />
-        </div>
-
-        <div className="shelf" data-reveal>
-          <div className="shelf__items">
-            <figure className="item">
-              <div className="line" aria-hidden="true">
-                <svg viewBox="0 0 200 50" preserveAspectRatio="none">
-                  <path d="M4 10 Q 100 40 196 10" />
-                </svg>
-                {['sky', 'mango', 'sage'].map((c, i) => (
-                  <span key={c} className={`line__tag clay clay--${c}`} style={{ '--i': i } as CSSProperties} />
-                ))}
-              </div>
-              <figcaption>
-                <span className="item__name">Pocket travel clothesline</span>
-                <span className="item__meta">an experiment</span>
-              </figcaption>
-            </figure>
-            <figure className="item">
-              <div className="books" aria-hidden="true">
-                <span className="book book--a" />
-                <span className="book book--b" />
-                <span className="book book--c" />
-                <span className="book book--d" />
-              </div>
-              <figcaption>
-                <span className="item__name">Fantasy books, Eragon first</span>
-                <span className="item__meta">on the reading shelf</span>
-              </figcaption>
-            </figure>
-            <figure className="item">
-              <div className="mini-phone cardboard" aria-hidden="true">
-                <span className="paper" />
-              </div>
-              <figcaption>
-                <span className="item__name">This website</span>
-                <span className="item__meta">built by hand, in code</span>
-              </figcaption>
-            </figure>
-          </div>
-          <div className="shelf__plank wood" aria-hidden="true" />
-        </div>
+      <div className="shelves">
+        <Shelf
+          items={
+            <>
+              <figure className="item item--cot">
+                <button
+                  type="button"
+                  key={wobble}
+                  className={`cot ${wobble ? 'is-wobbling' : ''}`}
+                  aria-label="A small wooden four-poster cot. Press to give it a nudge."
+                  onClick={() => {
+                    sound.tok()
+                    setWobble(w => w + 1)
+                  }}
+                >
+                  <img src={cotImg} alt="" width={909} height={691} draggable={false} />
+                </button>
+              </figure>
+              <figure className="item item--bake">
+                <BakeBoard />
+              </figure>
+            </>
+          }
+          labels={[
+            ['Four-poster cot', 'In progress, with a mentor. Tap to nudge'],
+            ['Cookies, brownies, focaccia, apple pie', 'Still testing substitutions. Tap for a bite'],
+          ]}
+        />
+        <Shelf
+          items={
+            <>
+              <figure className="item item--line">
+                <img src={lineImg} alt="" width={620} height={288} draggable={false} />
+              </figure>
+              <figure className="item item--books">
+                <img src={booksImg} alt="" width={600} height={407} draggable={false} />
+              </figure>
+            </>
+          }
+          labels={[
+            ['Pocket travel clothesline', 'An experiment'],
+            ['Fantasy books, Eragon first', 'On the reading shelf'],
+          ]}
+        />
       </div>
     </section>
   )
@@ -850,13 +956,13 @@ function Now() {
       <div className="now">
         <h2 id="now-title" className="now__title" data-reveal>
           Right now
-          <span>Nov 2026</span>
+          <span>Updated Nov 2026</span>
         </h2>
         <ul className="now__list">
           {nowNotes.map((n, i) => (
             <li key={n.k} className="now__item" data-reveal style={{ '--d': `${i * 70}ms` } as CSSProperties}>
-              <span className="card__k">{n.k}</span>
-              <span className="marker">{n.t}</span>
+              <span className="now__k">{n.k}</span>
+              <span className="now__t">{n.t}</span>
             </li>
           ))}
         </ul>
@@ -869,59 +975,36 @@ function Now() {
 /*  Say hi                                                             */
 /* ------------------------------------------------------------------ */
 
-function LostAndFound() {
-  const [open, setOpen] = useState(false)
-  return (
-    <button
-      type="button"
-      className={`lost ${open ? 'is-open' : ''}`}
-      aria-expanded={open}
-      aria-label={open ? 'Lost and found box, open. Press to close.' : 'A small box labelled lost and found. Press to open.'}
-      onClick={() => {
-        setOpen(o => !o)
-        sound.tap()
-        if (!open) window.setTimeout(() => sound.chime(true), 260)
-      }}
-    >
-      <span className="lost__inside" aria-hidden="true">
-        <span className="lost__cookie clay clay--cookie">
-          <i />
-          <i />
-          <i />
-        </span>
-      </span>
-      <span className="lost__flap lost__flap--l cardboard" aria-hidden="true" />
-      <span className="lost__flap lost__flap--r cardboard" aria-hidden="true" />
-      <span className="lost__box cardboard" aria-hidden="true">
-        <span className="lost__label">
-          lost &amp; found
-          <br />
-          no. 404
-        </span>
-      </span>
-      <span className="lost__msg marker" aria-live="polite">
-        {open ? 'nothing lost here. have a cookie.' : ''}
-      </span>
-    </button>
-  )
-}
-
 function SayHi() {
   return (
-    <section id="hi" className="section section--hi" aria-labelledby="hi-title">
-      <div className="hi cardboard" data-reveal>
-        <Tape className="tape--hi" />
-        <h2 id="hi-title">Let’s make something.</h2>
-        <p className="hi__sub">On a screen, or on a workbench.</p>
-        <div className="hi__links">
-          <a className="btn" href={`mailto:${CONTACT_EMAIL}`} onClick={() => sound.tap()}>
-            Email me
+    <section id="hi" className="closing" aria-labelledby="hi-title">
+      <div className="closing__inner">
+        <img className="closing__board" src={hiBoard} alt="" width={900} height={380} aria-hidden="true" />
+        <Kicker n={4}>Say hi</Kicker>
+        <h2 id="hi-title" data-reveal>
+          Let’s make something.
+        </h2>
+        <p className="closing__sub" data-reveal>
+          On a screen, or on a workbench.
+        </p>
+        <a className="closing__mail" href={`mailto:${CONTACT_EMAIL}`} onClick={() => sound.tap()} data-reveal>
+          {CONTACT_EMAIL}
+          <span aria-hidden="true">↗</span>
+        </a>
+        <div className="closing__links" data-reveal>
+          <a className="btn btn--light" href={`mailto:${CONTACT_EMAIL}`} onClick={() => sound.tap()}>
+            Write to me
           </a>
-          <a className="btn btn--ghost" href={GITHUB_URL} target="_blank" rel="noreferrer" onClick={() => sound.tap()}>
+          <a className="btn btn--line" href={GITHUB_URL} target="_blank" rel="noreferrer" onClick={() => sound.tap()}>
             GitHub <span aria-hidden="true">↗</span>
           </a>
         </div>
-        <p className="hi__email">{CONTACT_EMAIL}</p>
+        <footer className="footer">
+          <p>Neha NK, 2026. Cardboard, wood, clay and code.</p>
+          <a href="#hello" onClick={() => sound.tap()}>
+            Back to top ↑
+          </a>
+        </footer>
       </div>
     </section>
   )
@@ -943,8 +1026,8 @@ export default function App() {
         <span style={{ transform: `scaleX(${progress})` }} />
       </div>
       <header className="topbar">
-        <a href="#hello" className="stamp wood" onClick={() => sound.tok()}>
-          neha nk
+        <a href="#hello" className="plate" onClick={() => sound.tok()} aria-label="Neha NK, back to top">
+          <img src={plateImg} alt="" width={300} height={103} />
         </a>
         <nav aria-label="Main" className="tabs">
           {[
@@ -971,13 +1054,6 @@ export default function App() {
         <SayHi />
       </main>
 
-      <footer className="footer">
-        <p className="footer__bye">
-          Thanks for scrolling. <span className="marker">bye-bye</span>
-        </p>
-        <LostAndFound />
-        <p className="footer__small">Cardboard, tape, wood, clay and code. Neha NK, 2026.</p>
-      </footer>
     </div>
   )
 }
