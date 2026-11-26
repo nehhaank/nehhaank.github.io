@@ -186,7 +186,7 @@ export default function App() {
           <div className="hero-inner">
             <p className="eyebrow">Neha NK · Product designer</p>
             <h1 className="hero-title">
-              I design the <em>complicated middle</em> of software.
+              I just love <em>making things</em>.
             </h1>
             <p className="lede">
               Configuration screens, edge cases, multi-step journeys, and the small words that make them make sense.
