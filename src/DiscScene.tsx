@@ -48,7 +48,7 @@ export default function DiscScene() {
     scene.add(sun)
     scene.add(new THREE.HemisphereLight(0xfffbea, 0x5a7a52, 0.7))
 
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.ShadowMaterial({ opacity: 0.08, color: 0x1b2a21 }))
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.ShadowMaterial({ opacity: 0.32, color: 0x0c1a12 }))
     ground.rotation.x = -Math.PI / 2
     ground.position.y = -0.9
     ground.receiveShadow = true
@@ -94,9 +94,20 @@ export default function DiscScene() {
       const dist = camera.position.length()
       const visH = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * dist
       const visW = visH * camera.aspect
-      home.set(narrow ? visW * 0.22 : visW * 0.29, narrow ? visH * 0.12 : visH * 0.2, 0)
-      ground.position.y = home.y - (narrow ? 1.0 : 1.5)
-      disc.scale.setScalar(narrow ? 0.8 : 1.3)
+      // Park the disc on the anchor the page lays out for it.
+      const anchor = host.closest('.hero')?.querySelector('.disc-anchor')
+      if (anchor) {
+        const a = anchor.getBoundingClientRect()
+        const hr = host.getBoundingClientRect()
+        const nx = ((a.left + a.width / 2 - hr.left) / w) * 2 - 1
+        const ny = -((a.top + a.height / 2 - hr.top) / h) * 2 + 1
+        const dir = new THREE.Vector3(nx, ny, 0.5).unproject(camera).sub(camera.position).normalize()
+        home.copy(camera.position).addScaledVector(dir, -camera.position.z / dir.z)
+      } else {
+        home.set(visW * 0.29, visH * 0.2, 0)
+      }
+      ground.position.y = home.y - (narrow ? 0.7 : 1.0)
+      disc.scale.setScalar(narrow ? 0.62 : 0.92)
       const L = Math.min(visW * 0.42, 9)
       curve = new THREE.CatmullRomCurve3(
         [
@@ -118,6 +129,7 @@ export default function DiscScene() {
     layout()
     const ro = new ResizeObserver(layout)
     ro.observe(host)
+    document.fonts?.ready.then(layout)
 
     // pointer tilt and throw
     const pointer = new THREE.Vector2(0, 0)

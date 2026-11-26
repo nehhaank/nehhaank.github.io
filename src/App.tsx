@@ -1,10 +1,7 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { FieldMap } from './FieldMap'
-import cotImg from './assets/render-cot.jpg'
-import breadImg from './assets/render-focaccia.jpg'
-import booksImg from './assets/render-books.jpg'
-
-import { Mock } from './Mocks'
+import { Artboard } from './Mocks'
+import { Plate } from './Plates'
 
 const DiscScene = lazy(() => import('./DiscScene'))
 const GrassShader = lazy(() => import('./GrassShader'))
@@ -18,6 +15,7 @@ type Project = {
   kicker: string
   problem: string
   parts: string
+  notes: string[]
 }
 
 const projects: Project[] = [
@@ -29,6 +27,7 @@ const projects: Project[] = [
     problem:
       'The initial AI interviewer experience, then its second version: a clear split between structured and adaptive interviews, an adaptive deep-dive flow, and support for more than one interviewer.',
     parts: 'User testing, interview modes, controls, node-based configuration',
+    notes: ['Pick the mode first; settings follow from it', 'Follow-ups drawn as a branch, so “adaptive” is visible'],
   },
   {
     id: 'multilingual',
@@ -38,6 +37,7 @@ const projects: Project[] = [
     problem:
       'Language choice before and during a test, admin auto-detect and restrictions, English-locked questions, fallbacks, translation labels, and reports that keep the original-language answers.',
     parts: 'Language selection, in-test switching, translation labels, recruiter reports',
+    notes: ['Switch language without leaving the question', 'Every translated question says so'],
   },
   {
     id: 'registration',
@@ -47,6 +47,7 @@ const projects: Project[] = [
     problem:
       'A revamp of candidate onboarding and registration, including an AI-forward experience, so the first few minutes are clearer for people about to be assessed.',
     parts: 'Onboarding flow, registration, AI-forward entry',
+    notes: ['Two fields. Nothing optional, nothing extra', 'Proctoring consent stated before the test, not during'],
   },
   {
     id: 'onboarding',
@@ -56,6 +57,7 @@ const projects: Project[] = [
     problem:
       'Product and design work on an expert application journey: logged-out exploration, starting and resuming an application, an inline assessment, verification order and status progression.',
     parts: 'Journey mapping, resumable applications, inline assessment, specs',
+    notes: ['Status steps in the order they actually happen', 'Leave any time; resume exactly where you stopped'],
   },
   {
     id: 'planner',
@@ -65,6 +67,7 @@ const projects: Project[] = [
     problem:
       'A redesign of an internal planning tool around a single grid, with views by profile, work type and cohort, rows that expand in place, and outputs moved beneath the planning surface.',
     parts: 'Grid layout, view switching, inline expansion, helper text',
+    notes: ['One grid, three ways to slice it', 'The cell that needs attention is the only yellow one'],
   },
   {
     id: 'savings',
@@ -74,6 +77,7 @@ const projects: Project[] = [
     problem:
       'A KPI dashboard for estimated savings: a hero figure, with-and-without comparisons, a by-period chart, visible baseline assumptions and a step-by-step calculation breakdown.',
     parts: 'Comparative KPIs, assumption cards, calculation breakdown',
+    notes: ['With and without, on the same scale', 'Every figure can show its working'],
   },
 ]
 
@@ -95,10 +99,19 @@ const field = [
 ]
 
 const making = [
-  { img: cotImg, title: 'A four-poster cot', text: 'A woodworking project with a mentor. Joinery, material choices, and a lot of patience.', tag: 'In progress' },
-  { img: breadImg, title: 'Focaccia, and friends', text: 'Focaccia, chocolate-chip cookies, brownies, apple pie, and what a substitution does to texture.', tag: 'Ongoing' },
-  { img: booksImg, title: 'Fantasy, on the side', text: 'Dragons and long series. Eragon got there first.', tag: 'Always' },
+  { id: 'cot', fig: 'Front elevation', title: 'A four-poster cot', text: 'A woodworking project with a mentor. Joinery, material choices, and a lot of patience.', tag: 'In progress' },
+  { id: 'bread', fig: 'Plan view', title: 'Focaccia, and friends', text: 'Focaccia, chocolate-chip cookies, brownies, apple pie, and what a substitution does to texture.', tag: 'Ongoing' },
+  { id: 'books', fig: 'Shelf elevation', title: 'Fantasy, on the side', text: 'Dragons and long series. Eragon got there first.', tag: 'Always' },
 ]
+
+function Head({ id, title, note, dark, big }: { id: string; title: string; note?: string; dark?: boolean; big?: boolean }) {
+  return (
+    <header className={`sh${dark ? ' on-dark' : ''}${big ? ' is-big' : ''}`} data-reveal>
+      <h2 className="sh-t" id={id}>{title}</h2>
+      {note && <p className="sh-note">{note}</p>}
+    </header>
+  )
+}
 
 function useReveal() {
   useEffect(() => {
@@ -112,6 +125,7 @@ function useReveal() {
         entries.forEach((e) => {
           if (e.isIntersecting) {
             e.target.classList.add('is-in')
+            ;(e.target.querySelector('animateMotion') as SVGAnimationElement | null)?.beginElement()
             io.unobserve(e.target)
           }
         }),
@@ -151,7 +165,7 @@ export default function App() {
         <nav aria-label="Sections" className="top-nav">
           <a href="#work">Work</a>
           <a href="#field">Field</a>
-          <a href="#making">Making</a>
+          <a href="#making">By hand</a>
           <a href="#hello" className="top-cta">Say hello</a>
         </nav>
       </header>
@@ -164,82 +178,58 @@ export default function App() {
             </Suspense>
           </div>
           <h1 className="hero-title">
-            <span className="line">I design the</span>
-            <span className="line">
-              <em>
-                <span className="swipe">complicated</span> middle
-              </em>
-            </span>
-            <span className="line">of software.</span>
+            <span className="hl hl-1">I design the</span>
+            <span className="hl hl-band"><span>complicated middle</span><span className="disc-anchor" aria-hidden="true" /></span>
+            <span className="hl hl-3">of software.</span>
           </h1>
           <div className="hero-foot">
             <p className="lede">
               Configuration screens, edge cases, multi-step journeys, and the small words that make them make sense.
-              Most recently at <strong>WeCP</strong> and <strong>Invisible Technologies</strong>.
+              Most recently at WeCP and Invisible Technologies.
             </p>
-            <ul className="now" aria-label="Right now">
-              <li><span className="mono">Now</span>Captain, Learning to Fly</li>
-              <li><span className="mono">Also</span>Level 1 Ultimate coach</li>
-              <li><span className="mono">Bench</span>A four-poster cot, in wood</li>
-            </ul>
+            <dl className="ledger">
+              <div><dt>Now</dt><dd>Captain, Learning to Fly</dd></div>
+              <div><dt>Also</dt><dd>Level 1 Ultimate coach</dd></div>
+              <div><dt>Bench</dt><dd>A four-poster cot, in wood</dd></div>
+            </dl>
           </div>
         </section>
 
-        <section id="work" className="section work" aria-labelledby="work-h">
-          <div className="section-head rule" data-reveal>
-            <h2 className="h2 h2-sm" id="work-h">Selected work</h2>
-            <p className="section-note">
-              Six problems from two companies. The screens are simplified mock-ups; full case studies are being written.
-            </p>
-          </div>
-
+        <section id="work" className="section" aria-labelledby="work-h">
+          <Head id="work-h" title="Selected work" note="Six problems from two companies. Screens are simplified sketches; full case studies are on the way." />
           <ol className="projects">
             {projects.map((p, i) => (
-              <li className={`project ${i === 0 ? 'is-hero' : i > 2 ? 'is-small' : i % 2 ? 'is-flip' : ''}`} key={p.id} data-reveal>
-                <div className={`project-art tone-${i % 3}`}>
-                  <div className="mk-stage">
-                    <Mock id={p.id} />
-                  </div>
-                </div>
-                <div className="project-body">
-                  <p className="meta">
-                    <span className="mono">{String(i + 1).padStart(2, '0')}</span>
-                    <span>{p.company}</span>
-                    <span className="role">{p.company === 'WeCP' ? 'Product designer, until 2026' : 'Product designer, contract, 2026'}</span>
-                  </p>
-                  <h3>{p.title}</h3>
-                  <p className="kicker">{p.kicker}</p>
-                  <p className="problem">{p.problem}</p>
+              <li className={`pj ${i === 0 ? 'is-lead' : 'is-half'} tone-${i}`} key={p.id} data-reveal>
+                <Artboard id={p.id} notes={i === 0 ? p.notes : undefined} />
+                <div className="pj-body">
+                  <p className="label"><span>{String(i + 1).padStart(2, '0')}</span><span>{p.company}</span></p>
+                  <h3 className="pj-t">{p.title}</h3>
+                  <p className="pj-k">{p.kicker}</p>
+                  <p className="pj-p">{p.problem}</p>
                 </div>
               </li>
             ))}
+            <li className="pj is-half desk" data-reveal>
+              <h3 className="desk-h">Also on my desk</h3>
+              <p className="desk-sub">Smaller problems, each with its own tricky edge case.</p>
+              <ol className="desk-list">
+                {smaller.map(([c, t, d]) => (
+                  <li key={t}>
+                    <p className="d-t">{t} <span>{c}</span></p>
+                    <p className="d-d">{d}</p>
+                  </li>
+                ))}
+              </ol>
+            </li>
           </ol>
         </section>
 
-        <section className="section index" aria-labelledby="index-h">
-          <div className="section-head" data-reveal>
-            <h2 className="h2 h2-sm" id="index-h">Also on my desk</h2>
-            <p className="section-note">Smaller problems, each with its own tricky edge case.</p>
-          </div>
-          <ul className="index-list">
-            {smaller.map(([c, t, d]) => (
-              <li key={t} data-reveal>
-                <span className="mono i-co">{c}</span>
-                <span className="i-title">{t}</span>
-                <span className="i-desc">{d}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
         <section className="section ways" aria-labelledby="ways-h">
-          <div className="section-head" data-reveal>
-            <h2 className="h2 h2-sm" id="ways-h">How I work</h2>
-          </div>
+          <Head id="ways-h" title="How I work" />
           <p className="ways-text" data-reveal>
             I like the parts of a product where configuration, journeys and states have to hold together. I think in
-            systems: roles, history, localisation, edge cases. I care about the words on the buttons, and I work
-            closely with research and engineering to get them right.
+            systems: roles, history, localisation, edge cases. I care about the words on the buttons, and
+            I work closely with research and engineering to get them right.
           </p>
         </section>
 
@@ -248,16 +238,15 @@ export default function App() {
             <GrassShader />
           </Suspense>
           <div className="field-inner">
-            <div className="section-head" data-reveal>
-              <h2 className="h2" id="field-h">On the field</h2>
-              <p className="section-note">
-                Ultimate Frisbee is a big part of my life: a self-refereed sport where reading space, timing and
-                people matters as much as the throw.
-              </p>
-            </div>
+            <Head
+              id="field-h"
+              dark
+              title="On the field"
+              note="Ultimate Frisbee is a big part of my life: a self-refereed sport where reading space, timing and people matters as much as the throw."
+            />
             <FieldMap />
             <dl className="field-list">
-              {field.map(([t, k, d]) => (
+              {[...field, ['Also', 'Kit and sprints', 'Kit concepts for the Hong Kong campaign, and coached sprint sessions three times a week.']].map(([t, k, d]) => (
                 <div key={t} data-reveal>
                   <dt>{t}</dt>
                   <span className="f-k">{k}</span>
@@ -265,24 +254,19 @@ export default function App() {
                 </div>
               ))}
             </dl>
-            <p className="field-also" data-reveal>
-              Also: kit concepts for the Hong Kong campaign, and coached sprint sessions three times a week.
-            </p>
           </div>
         </section>
 
         <section id="making" className="section making" aria-labelledby="making-h">
-          <div className="section-head" data-reveal>
-            <h2 className="h2 h2-sm" id="making-h">Things I make by hand</h2>
-            <p className="section-note">Away from screens: wood, dough, and the occasional dragon.</p>
-          </div>
+          <Head id="making-h" title="Made by hand" note="Away from screens: wood, dough, and the occasional dragon." />
           <div className="make-grid">
-            {making.map((m) => (
-              <article className="make" key={m.title} data-reveal>
-                <div className="make-img">
-                  <img src={m.img} alt="" decoding="async" width="900" height="900" />
-                  <span className="mono tag">{m.tag}</span>
-                </div>
+            {making.map((m, i) => (
+              <article className={`make make-${m.id}`} key={m.title} data-reveal>
+                <figure className="plate">
+                  <Plate id={m.id} />
+                  <figcaption><span>Fig. {i + 1}</span><span>{m.fig}</span></figcaption>
+                </figure>
+                <p className="label">{m.tag}</p>
                 <h3>{m.title}</h3>
                 <p>{m.text}</p>
               </article>
@@ -291,26 +275,23 @@ export default function App() {
         </section>
 
         <section id="hello" className="hello" aria-labelledby="hello-h">
-          <h2 id="hello-h" className="h2 h2-sm" data-reveal>Say hello</h2>
-          <a className="hello-mail" href={`mailto:${EMAIL}`} data-reveal>
-            {EMAIL}
-          </a>
-          <div className="hello-actions" data-reveal>
-            <button type="button" className="copy" onClick={copy} aria-live="polite">
-              {copied ? 'Copied ✓' : 'Copy email'}
-            </button>
-            <span className="hello-note">Hiring, collaborating, or stuck on a tricky flow? Email is best, and my résumé is available on request.</span>
+          <div className="hello-inner">
+            <Head id="hello-h" dark title="Say hello" note="Hiring, collaborating, or stuck on a tricky flow? Email is best, and my résumé is available on request." />
+            <a className="hello-mail" href={`mailto:${EMAIL}`} data-reveal>
+              <span>{EMAIL}</span>
+            </a>
+            <div className="hello-actions" data-reveal>
+              <button type="button" className="copy" onClick={copy} aria-live="polite">
+                {copied ? 'Copied ✓' : 'Copy email'}
+              </button>
+            </div>
+            <div className="foot">
+              <span>© 2026 Neha NK, product designer</span>
+              <a href="#top">Back to top ↑</a>
+            </div>
           </div>
         </section>
       </main>
-
-      <footer className="foot">
-        <div className="foot-inner">
-          <span className="foot-disc" aria-hidden="true" />
-          <span>© 2026 Neha NK, product designer</span>
-          <a href="#top">Back to top ↑</a>
-        </div>
-      </footer>
     </>
   )
 }

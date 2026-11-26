@@ -1,16 +1,13 @@
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import grassUrl from './assets/grass.jpg'
 
-// The field band's ground: a generated grass image, moved by a shader.
-// Wind sways the blades, a slow cloud shadow drifts across, and the pointer lights the turf.
+// The field band's ground: mown turf drawn by a shader.
+// Stripes from the mower, a slow cloud shadow, and the pointer lights the grass.
 const frag = /* glsl */ `
   precision highp float;
-  uniform sampler2D uTex;
   uniform float uTime;
   uniform vec2 uRes;
   uniform vec2 uMouse;
-  uniform float uImgAspect;
   varying vec2 vUv;
 
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
@@ -21,33 +18,25 @@ const frag = /* glsl */ `
   }
 
   void main() {
-    // cover-fit the image
-    float screenAspect = uRes.x / uRes.y;
-    vec2 uv = vUv;
-    if (screenAspect > uImgAspect) { uv.y = (uv.y - 0.5) * uImgAspect / screenAspect + 0.5; }
-    else { uv.x = (uv.x - 0.5) * screenAspect / uImgAspect + 0.5; }
-
-    // wind: gusts travel diagonally and bend the blades sideways
-    float gust = noise(vec2(uv.x * 3.0 - uTime * 0.35, uv.y * 2.0 + uTime * 0.1));
-    uv.x += (gust - 0.5) * 0.006;
-
-    vec3 col = texture2D(uTex, uv).rgb;
-
-    // drifting cloud shadow
-    float cloud = noise(vUv * vec2(1.4, 1.0) + vec2(uTime * 0.03, uTime * 0.01));
-    col *= 0.9 + 0.2 * smoothstep(0.25, 0.8, cloud);
-
+    vec2 px = vUv * uRes;
+    // mowing stripes: fixed 160px bands, crisp but not hard
+    float band = mod(floor(px.x / 160.0), 2.0);
+    float edge = smoothstep(0.0, 2.0, abs(mod(px.x, 160.0) - 0.0));
+    vec3 a = vec3(0.114, 0.275, 0.188);
+    vec3 b = vec3(0.133, 0.310, 0.212);
+    vec3 col = mix(a, b, band);
+    // blade texture: fine streaks running with the mow direction
+    float blades = noise(vec2(px.x * 0.9, px.y * 0.035 + band * 40.0));
+    col *= 0.96 + 0.06 * blades;
+    // slow cloud shadow
+    float cloud = noise(vUv * vec2(1.6, 1.0) * 1.2 + vec2(uTime * 0.025, uTime * 0.008));
+    col *= 0.93 + 0.1 * smoothstep(0.3, 0.8, cloud);
     // pointer light
-    vec2 d = (vUv - uMouse) * vec2(screenAspect, 1.0);
-    col += vec3(0.95, 0.85, 0.35) * 0.12 * exp(-dot(d, d) * 9.0);
-
-    // keep text legible: pull toward deep green and vignette the edges
-    col = mix(col, vec3(0.11, 0.27, 0.18), 0.15);
-    float v = smoothstep(1.25, 0.35, length((vUv - 0.5) * vec2(1.2, 1.6)));
-    col *= 0.9 + 0.1 * v;
-
-    // film grain
-    col += (hash(vUv * uRes + uTime) - 0.5) * 0.015;
+    float aspect = uRes.x / uRes.y;
+    vec2 d = (vUv - uMouse) * vec2(aspect, 1.0);
+    col += vec3(0.95, 0.82, 0.3) * 0.07 * exp(-dot(d, d) * 6.0);
+    col += (hash(px + uTime) - 0.5) * 0.018;
+    col *= edge * 0.04 + 0.96;
     gl_FragColor = vec4(col, 1.0);
   }
 `
@@ -71,11 +60,9 @@ export default function GrassShader() {
     const scene = new THREE.Scene()
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
     const uniforms = {
-      uTex: { value: null as THREE.Texture | null },
       uTime: { value: 0 },
       uRes: { value: new THREE.Vector2(1, 1) },
       uMouse: { value: new THREE.Vector2(0.7, 0.6) },
-      uImgAspect: { value: 16 / 9 },
     }
     const mat = new THREE.ShaderMaterial({
       uniforms,
@@ -84,16 +71,8 @@ export default function GrassShader() {
     })
     scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat))
 
-    let ready = false
-    new THREE.TextureLoader().load(grassUrl, (tex) => {
-      tex.wrapS = tex.wrapT = THREE.MirroredRepeatWrapping
-      uniforms.uTex.value = tex
-      const img = tex.image as HTMLImageElement
-      uniforms.uImgAspect.value = img.width / img.height
-      ready = true
-      host.classList.add('is-ready')
-      renderer.render(scene, camera)
-    })
+    const ready = true
+    host.classList.add('is-ready')
 
     const layout = () => {
       const w = host.clientWidth
