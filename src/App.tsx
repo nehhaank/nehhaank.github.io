@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { FieldMap } from './FieldMap'
 import { Artboard } from './Mocks'
 import { Frisbee } from './toys/Frisbee'
@@ -9,9 +9,6 @@ import { Stamps } from './toys/Stamps'
 import { Carve } from './toys/Carve'
 import { TinyBook } from './toys/TinyBook'
 import { SakuraBottle } from './toys/SakuraBottle'
-
-const TileShader = lazy(() => import('./toys/TileShader'))
-const GrassShader = lazy(() => import('./GrassShader'))
 
 const EMAIL = 'nehhaank@gmail.com'
 
@@ -180,17 +177,14 @@ export default function App() {
 
       <main id="main">
         <section className="hero" id="top" data-name="the hero">
-          <Suspense fallback={null}>
-            <TileShader />
-          </Suspense>
           <div className="hero-inner">
-            <p className="eyebrow">Neha NK · Product designer</p>
+            <p className="eyebrow">Neha NK, product designer</p>
             <h1 className="hero-title">
               I just love <em>making things</em>.
             </h1>
             <p className="lede">
-              Configuration screens, edge cases, multi-step journeys, and the small words that make them make sense.
-              Most recently at WeCP and Invisible Technologies.
+              Software, mostly: configuration screens, edge cases and the small words that make them make sense, most
+              recently at WeCP and Invisible Technologies. Also spoons, stamps, clay and tiny books.
             </p>
             <dl className="ledger">
               <div><dt>Now</dt><dd>Captain, Learning to Fly</dd></div>
@@ -254,9 +248,6 @@ export default function App() {
         </section>
 
         <section id="field" className="field" aria-labelledby="field-h" data-name="On the field">
-          <Suspense fallback={null}>
-            <GrassShader />
-          </Suspense>
           <div className="field-inner">
             <Head
               id="field-h"
@@ -279,7 +270,7 @@ export default function App() {
         </section>
 
         <section id="making" className="section making" aria-labelledby="making-h" data-name="Made by hand">
-          <Head id="making-h" n="05" title={<>Made <em>by hand</em></>} note="Away from screens: clay, erasers, wood and paper. Everything on this table is real, and you can play with all of it." />
+          <Head id="making-h" n="05" title={<>Made <em>by hand</em></>} note="Away from screens: clay, erasers, wood and paper. Everything here is real, and you can play with all of it." />
           <div className="table">
             <article className="craft craft-clay">
               <ClayTicTacToe />
