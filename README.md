@@ -20,16 +20,12 @@ These commands check TypeScript, build the site into `dist/`, and serve the prod
 
 ## Edit the site
 
-- `src/App.tsx`: name, introduction, project placeholders, and footer. Replace the clearly marked `hello@example.com` contact placeholder with your own email.
-- `src/index.css`: colors, typography, layout details, and abstract project illustrations.
-- `src/main.tsx`: React entry point.
-- `index.html`: page title and description.
-- `vite.config.ts`: Vite, React, and Tailwind setup. The root base path matches `nehhaank.github.io`.
+- `src/App.tsx`: all the words and little objects. The content lists sit at the top of the file (`projects`, `smallThings`, `blobs`, `nowNotes`). To show an email, set `CONTACT_EMAIL` near the top; it stays hidden while empty.
+- `src/index.css`: the materials (cardboard, tape, wood, clay), colours, type and every animation. Motion is switched off automatically for visitors who ask their device for reduced motion.
+- `src/sound.ts`: the soft sounds, made in the browser with the Web Audio API. Sound is off until a visitor turns it on with the toggle in the bottom-left corner.
+- `public/404.html`: the "lost & found" page shown for missing links.
+- `index.html`: page title, description and fonts.
 
-The project cards are placeholders, with decorative artwork and no invented case studies or results. Replace the `projects` array and card contents when real work is ready.
+## Publishing
 
-## Deploy later — optional
-
-Nothing has been published by setup. `.github/workflows/deploy.yml` runs **only when manually requested**; pushes do not trigger deployment.
-
-When ready, commit and push your reviewed changes, select **GitHub Actions** under the repository's **Settings → Pages → Build and deployment**, and manually run **Deploy portfolio to GitHub Pages** from the Actions tab. This will publish the site. Do not run it until you want to publish.
+`.github/workflows/deploy.yml` builds and publishes the site to https://nehhaank.github.io every time `main` changes. Work on a branch and open a pull request; merging the pull request is what publishes it.
