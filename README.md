@@ -1,6 +1,6 @@
-# Neha NK — personal portfolio
+# Neha NK — personal site
 
-A static portfolio built with Vite, React, TypeScript, and Tailwind CSS. Requires Node.js 24 and npm. No backend, accounts, or secret keys are needed.
+A static personal website built with Vite, React and TypeScript. Requires Node.js 24 and npm.
 
 ## Preview locally
 
@@ -9,27 +9,26 @@ npm ci
 npm run dev
 ```
 
-Open the address printed by Vite in a local development environment. In a cloud environment, use the available browser/port preview tooling. Stop the server with Ctrl+C.
+`npm run build` checks TypeScript and builds the site into `dist/`. `npm run preview` serves that build.
+
+## Where things live
+
+- `src/App.tsx` — all the words: projects, smaller problems, how I work, Ultimate, making, contact.
+- `src/index.css` — colours, type, layout and motion. Colour tokens are at the top.
+- `src/Mocks.tsx` — the simplified mock screens on each project. Swap these for real screenshots when they're ready.
+- `src/DiscScene.tsx` — the real-time 3D disc in the hero (three.js). Click it, or press 8, to throw it.
+- `src/GrassShader.tsx` — the shader that moves the grass behind the Ultimate section.
+- `src/FieldMap.tsx` — the to-scale Ultimate field diagram.
+- `src/assets/` — generated images. Nothing here is a photo or from an AI image model.
+
+## Regenerating the images
 
 ```sh
-npm run build
-npm run preview
+python3 scripts/make-textures.py          # grass, wood, focaccia and page textures (numpy + Pillow)
+python3 -m http.server 8123 &             # serve the repo for the renderer
+node scripts/render-objects.cjs           # renders the cot, focaccia and books with three.js (needs Playwright)
 ```
 
-These commands check TypeScript, build the site into `dist/`, and serve the production build. There is no automated test suite yet.
+## Publishing
 
-## Edit the site
-
-- `src/App.tsx`: name, introduction, project placeholders, and footer. Replace the clearly marked `hello@example.com` contact placeholder with your own email.
-- `src/index.css`: colors, typography, layout details, and abstract project illustrations.
-- `src/main.tsx`: React entry point.
-- `index.html`: page title and description.
-- `vite.config.ts`: Vite, React, and Tailwind setup. The root base path matches `nehhaank.github.io`.
-
-The project cards are placeholders, with decorative artwork and no invented case studies or results. Replace the `projects` array and card contents when real work is ready.
-
-## Deploy later — optional
-
-Nothing has been published by setup. `.github/workflows/deploy.yml` runs **only when manually requested**; pushes do not trigger deployment.
-
-When ready, commit and push your reviewed changes, select **GitHub Actions** under the repository's **Settings → Pages → Build and deployment**, and manually run **Deploy portfolio to GitHub Pages** from the Actions tab. This will publish the site. Do not run it until you want to publish.
+`.github/workflows/deploy.yml` builds and publishes to https://nehhaank.github.io every time `main` changes. Merging a pull request into `main` publishes it.
