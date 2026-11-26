@@ -1,24 +1,23 @@
-// A top-down Ultimate field (100 × 37 m, 18 m end zones) with one break throw curving around a mark.
+// A top-down Ultimate field: 100 × 37 m with 18 m end zones, drawn to scale (10 px = 1 m).
 export function FieldMap() {
   return (
     <figure className="fieldmap" data-reveal>
-      <svg viewBox="0 0 370 1000" role="img" aria-label="Diagram of an Ultimate field with a curved break throw">
-        <rect x="6" y="6" width="358" height="988" className="fm-line" />
-        <line x1="6" y1="186" x2="364" y2="186" className="fm-line" />
-        <line x1="6" y1="814" x2="364" y2="814" className="fm-line" />
-        <text x="185" y="104" className="fm-text">END ZONE</text>
-        <text x="185" y="910" className="fm-text">END ZONE</text>
-        <g className="fm-brick">
-          <path d="M179 344l12 12M191 344l-12 12" />
-          <path d="M179 652l12 12M191 652l-12 12" />
-        </g>
-        <circle cx="140" cy="700" r="10" className="fm-thrower" />
-        <circle cx="168" cy="676" r="10" className="fm-mark" />
-        <path d="M140 690 C 300 600, 330 420, 236 236" className="fm-throw" />
-        <circle cx="236" cy="236" r="10" className="fm-catch" />
-        <path d="M290 330 C 260 300, 246 270, 238 250" className="fm-cut" />
+      <svg viewBox="-10 -10 1020 390" role="img" aria-label="Diagram of an Ultimate field, drawn to scale, with a curved break throw">
+        <rect x="0" y="0" width="1000" height="370" className="fm-line" />
+        <line x1="180" y1="0" x2="180" y2="370" className="fm-line" />
+        <line x1="820" y1="0" x2="820" y2="370" className="fm-line" />
+        <path d="M360 179l12 12M372 179l-12 12M628 179l12 12M640 179l-12 12" className="fm-line" />
+        <text x="90" y="190" className="fm-text" transform="rotate(-90 90 190)">END ZONE</text>
+        <text x="910" y="190" className="fm-text" transform="rotate(-90 910 190)">END ZONE</text>
+                <circle cx="300" cy="250" r="10" className="fm-thrower" />
+        <path d="M318 230 l22 -22" className="fm-mark" />
+        <path d="M300 250 C 420 360, 640 330, 760 140" className="fm-throw" />
+        <circle cx="760" cy="140" r="10" className="fm-catch" />
+        <text x="282" y="257" className="fm-lab" textAnchor="end">Thrower</text>
+        <text x="300" y="205" className="fm-lab">Mark</text>
+        <text x="742" y="112" className="fm-lab" textAnchor="end">Receiver</text>
       </svg>
-      <figcaption className="mono">Fig. 1: an around break, thrown from the brick.</figcaption>
+      <figcaption><span>An around break, thrown past the mark into space.</span><span className="mono">100 × 37 m, to scale</span></figcaption>
     </figure>
   )
 }

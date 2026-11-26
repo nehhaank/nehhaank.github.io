@@ -15,10 +15,19 @@ npm run dev
 
 - `src/App.tsx` — all the words: projects, smaller problems, how I work, Ultimate, making, contact.
 - `src/index.css` — colours, type, layout and motion. Colour tokens are at the top.
-- `src/WorkArt.tsx` — the schematic illustrations on each project card (sketches, not product screenshots).
-- `src/Disc.tsx` — the throwable disc in the hero (click it, or press 8).
-- `src/FlightNav.tsx` — the dotted flight path on the right edge that tracks scroll on wide screens.
-- `src/FieldMap.tsx` — the Ultimate field diagram.
+- `src/Mocks.tsx` — the simplified mock screens on each project. Swap these for real screenshots when they're ready.
+- `src/DiscScene.tsx` — the real-time 3D disc in the hero (three.js). Click it, or press 8, to throw it.
+- `src/GrassShader.tsx` — the shader that moves the grass behind the Ultimate section.
+- `src/FieldMap.tsx` — the to-scale Ultimate field diagram.
+- `src/assets/` — generated images. Nothing here is a photo or from an AI image model.
+
+## Regenerating the images
+
+```sh
+python3 scripts/make-textures.py          # grass, wood, focaccia and page textures (numpy + Pillow)
+python3 -m http.server 8123 &             # serve the repo for the renderer
+node scripts/render-objects.cjs           # renders the cot, focaccia and books with three.js (needs Playwright)
+```
 
 ## Publishing
 
