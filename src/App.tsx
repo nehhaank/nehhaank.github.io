@@ -1,9 +1,18 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react'
 import { sound } from './sound'
+import blockN from './assets/obj/blockN.webp'
+import blockK from './assets/obj/blockK.webp'
+import cotImg from './assets/obj/cot.webp'
+import pegA from './assets/obj/pegA.webp'
+import pegB from './assets/obj/pegB.webp'
+import token22 from './assets/obj/token22.webp'
+import token30 from './assets/obj/token30.webp'
+import token38 from './assets/obj/token38.webp'
+import token30w from './assets/obj/token30w.webp'
+import token38w from './assets/obj/token38w.webp'
 
 /* ------------------------------------------------------------------ */
 /*  Content. Kept short on purpose: the site should be fun to scroll.  */
-/*  Add an email here when you are ready to show one publicly.         */
 /* ------------------------------------------------------------------ */
 
 const CONTACT_EMAIL = 'nehhaank@gmail.com'
@@ -11,37 +20,28 @@ const GITHUB_URL = 'https://github.com/nehhaank'
 
 type Art = 'chat' | 'tiles' | 'steps' | 'grid' | 'bars' | 'form'
 
-const projects: { title: string; where: string; art: Art; note: string; tilt: number }[] = [
-  { title: 'AI Interviewer', where: 'WeCP', art: 'chat', tilt: -1.4, note: 'Helped shape the first AI interviewer, then structured vs. adaptive modes and multiple interviewers. The puzzle: make an unfamiliar AI conversation easy to understand and set up.' },
-  { title: 'Tests in any language', where: 'WeCP', art: 'tiles', tilt: 0.7, note: 'Language choice, fallbacks, switching mid-test and translated reports, so a candidate anywhere gets the same fair test.' },
-  { title: 'Candidate onboarding', where: 'WeCP', art: 'steps', tilt: -0.7, note: 'Reworked registration to take the friction out of the minutes before a test even begins.' },
-  { title: 'Capacity planner', where: 'Invisible Technologies', art: 'grid', tilt: 1.4, note: 'A dense internal planning tool, rebuilt around one clear grid with views by profile, work type and cohort.' },
-  { title: 'Savings dashboard', where: 'Invisible Technologies', art: 'bars', tilt: -2.1, note: 'Made modeled savings readable and traceable: one hero number, honest comparisons, and the math laid open.' },
-  { title: 'Expert applications', where: 'Invisible Technologies', art: 'form', tilt: 0.7, note: 'Mapped the whole path from browsing to applying, signing up, coming back later and taking an inline assessment.' },
+const projects: { title: string; where: string; art: Art; note: string; featured?: boolean }[] = [
+  { title: 'AI Interviewer', where: 'WeCP', art: 'chat', featured: true, note: 'Helped shape the first AI interviewer, then structured vs. adaptive modes and multiple interviewers. The puzzle: make an unfamiliar AI conversation easy to understand and set up.' },
+  { title: 'Tests in any language', where: 'WeCP', art: 'tiles', featured: true, note: 'Language choice, fallbacks, switching mid-test and translated reports, so a candidate anywhere gets the same fair test.' },
+  { title: 'Candidate onboarding', where: 'WeCP', art: 'steps', note: 'Reworked registration to take the friction out of the minutes before a test even begins.' },
+  { title: 'Capacity planner', where: 'Invisible Technologies', art: 'grid', note: 'A dense internal planning tool, rebuilt around one clear grid with views by profile, work type and cohort.' },
+  { title: 'Savings dashboard', where: 'Invisible Technologies', art: 'bars', note: 'Made modeled savings readable and traceable: one hero number, honest comparisons, and the math laid open.' },
+  { title: 'Expert applications', where: 'Invisible Technologies', art: 'form', note: 'Mapped the whole path from browsing to applying, signing up, coming back later and taking an inline assessment.' },
 ]
 
 const smallThings = ['Report integrity', 'Proctoring status language', 'Section timers', 'Answer explanations', 'Listening questions', 'Readable graphs', 'Retake wording']
 
-const blobs: { label: string; color: string }[] = [
-  { label: 'Complex workflows', color: 'terracotta' },
-  { label: 'Systems thinking', color: 'sage' },
-  { label: 'AI interactions', color: 'sky' },
-  { label: 'Edge cases', color: 'mango' },
-  { label: 'UX writing', color: 'rose' },
-  { label: 'Data viz', color: 'sky' },
-  { label: 'Research', color: 'terracotta' },
-  { label: 'Prototyping', color: 'sage' },
+const tokens: { label: string; img: string; w: number; dark?: boolean; r: number }[] = [
+  { label: 'Complex workflows', img: token38, w: 974, r: -3 },
+  { label: 'Systems thinking', img: token38w, w: 974, dark: true, r: 2 },
+  { label: 'AI interactions', img: token38, w: 974, r: 4 },
+  { label: 'Edge cases', img: token30w, w: 861, dark: true, r: -2 },
+  { label: 'UX writing', img: token30, w: 861, r: 3 },
+  { label: 'Data viz', img: token22, w: 740, r: -4 },
+  { label: 'Research', img: token22, w: 740, r: 1 },
+  { label: 'Prototyping', img: token30, w: 861, r: -1 },
 ]
 
-const SECTIONS = [
-  { id: 'hello', label: 'hello' },
-  { id: 'work', label: 'work' },
-  { id: 'how', label: 'how' },
-  { id: 'field', label: 'field' },
-  { id: 'making', label: 'making' },
-  { id: 'now', label: 'now' },
-  { id: 'hi', label: 'say hi' },
-]
 
 /* ------------------------------------------------------------------ */
 /*  Small hooks                                                        */
@@ -65,7 +65,7 @@ function useSoundOn() {
   return on
 }
 
-/** Pieces "stick" onto the page as they scroll into view. */
+/** Pieces settle onto the desk as they scroll into view. */
 function useReveal() {
   useEffect(() => {
     const els = document.querySelectorAll<HTMLElement>('[data-reveal]')
@@ -78,69 +78,14 @@ function useReveal() {
           }
         })
       },
-      { rootMargin: '0px 0px -8% 0px', threshold: 0.12 },
+      { rootMargin: '0px 0px -6% 0px', threshold: 0.1 },
     )
     els.forEach(el => io.observe(el))
     return () => io.disconnect()
   }, [])
 }
 
-function useActiveSection() {
-  const [active, setActive] = useState(0)
-  useEffect(() => {
-    const els = SECTIONS.map(s => document.getElementById(s.id)).filter(Boolean) as HTMLElement[]
-    const io = new IntersectionObserver(
-      entries => {
-        entries.forEach(e => {
-          if (e.isIntersecting) setActive(SECTIONS.findIndex(s => s.id === e.target.id))
-        })
-      },
-      { rootMargin: '-45% 0px -50% 0px' },
-    )
-    els.forEach(el => io.observe(el))
-    return () => io.disconnect()
-  }, [])
-  return active
-}
-
-/* ------------------------------------------------------------------ */
-/*  Bits and bobs                                                      */
-/* ------------------------------------------------------------------ */
-
-function Tape({ className = '', style }: { className?: string; style?: CSSProperties }) {
-  return <span className={`tape ${className}`} style={style} aria-hidden="true" />
-}
-
-function BoxLabel({ n, children }: { n: number; children: string }) {
-  return (
-    <p className="box-label" data-reveal>
-      <span className="box-label__no">box {String(n).padStart(2, '0')}</span>
-      <span className="box-label__name">{children}</span>
-      <span className="box-label__arrow" aria-hidden="true">this side up ↑</span>
-    </p>
-  )
-}
-
-function SoundToggle() {
-  const on = useSoundOn()
-  return (
-    <button
-      type="button"
-      className={`sound-toggle ${on ? 'is-on' : ''}`}
-      aria-pressed={on}
-      aria-label={on ? 'Turn sound off' : 'Turn sound on'}
-      onClick={() => sound.set(!on)}
-    >
-      <span className="sound-toggle__track" aria-hidden="true">
-        <span className="sound-toggle__knob" />
-      </span>
-      <span className="sound-toggle__text">sound {on ? 'on' : 'off'}</span>
-      <span className="sound-toggle__led" aria-hidden="true" />
-    </button>
-  )
-}
-
-function Ruler({ active }: { active: number }) {
+function useScrollProgress() {
   const [progress, setProgress] = useState(0)
   useEffect(() => {
     let raf = 0
@@ -161,34 +106,49 @@ function Ruler({ active }: { active: number }) {
       cancelAnimationFrame(raf)
     }
   }, [])
+  return progress
+}
+
+/* ------------------------------------------------------------------ */
+/*  Bits and bobs                                                      */
+/* ------------------------------------------------------------------ */
+
+function Tape({ className = '' }: { className?: string }) {
+  return <span className={`tape ${className}`} aria-hidden="true" />
+}
+
+function ShippingLabel({ n, children }: { n: number; children: string }) {
   return (
-    <nav className="ruler" aria-label="Sections">
-      <div className="ruler__wood wood">
-        {Array.from({ length: 29 }, (_, i) => (
-          <span key={i} className={`ruler__tick ${i % 4 === 0 ? 'is-long' : ''}`} style={{ top: `${(i / 28) * 100}%` }} aria-hidden="true" />
-        ))}
-        {SECTIONS.map((s, i) => (
-          <a
-            key={s.id}
-            href={`#${s.id}`}
-            className={`ruler__stop ${i === active ? 'is-active' : ''}`}
-            style={{ top: `${(i / (SECTIONS.length - 1)) * 100}%` }}
-            onClick={() => sound.tok()}
-          >
-            <span>{s.label}</span>
-          </a>
-        ))}
-        <span className="ruler__bead clay clay--mango" style={{ top: `${progress * 100}%` }} aria-hidden="true" />
-      </div>
-      <div className="ruler__mobile" aria-hidden="true">
-        <span style={{ transform: `scaleX(${progress})` }} />
-      </div>
-    </nav>
+    <p className="ship" data-reveal>
+      <span className="ship__no">box {String(n).padStart(2, '0')}</span>
+      <span className="ship__name">{children}</span>
+      <span className="ship__arrow" aria-hidden="true">
+        ↑↑ this side up
+      </span>
+    </p>
+  )
+}
+
+function SoundToggle() {
+  const on = useSoundOn()
+  return (
+    <button
+      type="button"
+      className={`sound-toggle ${on ? 'is-on' : ''}`}
+      aria-pressed={on}
+      aria-label={on ? 'Turn sound off' : 'Turn sound on'}
+      onClick={() => sound.set(!on)}
+    >
+      <span className="sound-toggle__track" aria-hidden="true">
+        <span className="sound-toggle__knob" />
+      </span>
+      <span className="sound-toggle__text">sound {on ? 'on' : 'off'}</span>
+    </button>
   )
 }
 
 /* ------------------------------------------------------------------ */
-/*  01  Hello                                                          */
+/*  Hello                                                              */
 /* ------------------------------------------------------------------ */
 
 const greetings = ['hello!', 'welcome in', 'mind the tape', 'press again?', 'ok, now scroll ↓']
@@ -201,10 +161,8 @@ function Hero({ reduced }: { reduced: boolean }) {
   const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (reduced || e.pointerType !== 'mouse' || !stage.current) return
     const r = stage.current.getBoundingClientRect()
-    const x = (e.clientX - r.left) / r.width - 0.5
-    const y = (e.clientY - r.top) / r.height - 0.5
-    stage.current.style.setProperty('--mx', x.toFixed(3))
-    stage.current.style.setProperty('--my', y.toFixed(3))
+    stage.current.style.setProperty('--mx', ((e.clientX - r.left) / r.width - 0.5).toFixed(3))
+    stage.current.style.setProperty('--my', ((e.clientY - r.top) / r.height - 0.5).toFixed(3))
   }
   const onLeave = () => {
     stage.current?.style.setProperty('--mx', '0')
@@ -214,7 +172,9 @@ function Hero({ reduced }: { reduced: boolean }) {
   return (
     <section id="hello" className="hero" aria-labelledby="hero-title">
       <div className="hero__copy">
-        <p className="stencil" data-reveal>product designer · maker · frisbee captain</p>
+        <p className="eyebrow" data-reveal>
+          Product designer, maker, frisbee captain
+        </p>
         <h1 id="hero-title" data-reveal>
           Hi, I’m{' '}
           <span className="tape-word">
@@ -224,26 +184,30 @@ function Hero({ reduced }: { reduced: boolean }) {
           .
         </h1>
         <p className="lede" data-reveal>
-          I untangle complicated software until it feels simple. Off-screen, I’m usually on a frisbee field, at a workbench, or hovering near an oven.
+          I untangle complicated software until it feels simple. Off-screen I’m on a frisbee field, at a workbench, or near an oven.
         </p>
         <div className="hero__actions" data-reveal>
-          <a className="clay-btn clay clay--mango" href="#work" onClick={() => sound.squish()}>
-            see the prototypes <span aria-hidden="true">↓</span>
+          <a className="btn" href="#work" onClick={() => sound.tap()}>
+            See the work <span aria-hidden="true">↓</span>
           </a>
-          <p className="marker hero__hint">psst, everything here is pokeable</p>
+          <a className="btn btn--ghost" href="#hi" onClick={() => sound.tap()}>
+            Say hi
+          </a>
         </div>
       </div>
 
       <div className="hero__stage" ref={stage} onPointerMove={onMove} onPointerLeave={onLeave}>
         <div className="phone cardboard" data-reveal>
-          <Tape className="tape--phone-a" />
-          <Tape className="tape--phone-b" />
+          <Tape className="tape--phone" />
           <span className="phone__speaker" aria-hidden="true" />
           <div className="phone__screen paper">
             <div className="phone__status" aria-hidden="true">
-              <span />
-              <span />
-              <span />
+              <span>9:41</span>
+              <span className="phone__dots">
+                <i />
+                <i />
+                <i />
+              </span>
             </div>
             <p className="phone__greet marker" aria-live="polite">
               {greetings[g]}
@@ -267,25 +231,17 @@ function Hero({ reduced }: { reduced: boolean }) {
               press
             </button>
           </div>
-          <span className="phone__home clay clay--sage" aria-hidden="true" />
         </div>
 
-        <div className="block block--n wood" aria-hidden="true">
-          N
-        </div>
-        <div className="block block--k wood wood--walnut" aria-hidden="true">
-          K
-        </div>
-        <div className="hero__disc clay clay--sky" aria-hidden="true">
-          <span />
-        </div>
+        <img className="obj obj--n" src={blockN} alt="" width={595} height={471} />
+        <img className="obj obj--k" src={blockK} alt="" width={591} height={458} />
         <div className="hero__cursor" aria-hidden="true">
           <svg viewBox="0 0 40 52">
             <path d="M4 3 L35 31 L21 32 L28 48 L21 50 L14 35 L4 44 Z" />
           </svg>
         </div>
-        <p className="marker hero__arrow-note" aria-hidden="true">
-          press the button
+        <p className="marker hero__note" aria-hidden="true">
+          go on, press it
           <svg viewBox="0 0 80 40">
             <path d="M4 34 C 26 34, 50 26, 68 6 M68 6 L 56 10 M68 6 L 68 19" />
           </svg>
@@ -296,7 +252,7 @@ function Hero({ reduced }: { reduced: boolean }) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  02  Work                                                           */
+/*  Work                                                               */
 /* ------------------------------------------------------------------ */
 
 function ProjectArt({ art }: { art: Art }) {
@@ -304,13 +260,16 @@ function ProjectArt({ art }: { art: Art }) {
     case 'chat':
       return (
         <div className="art art--chat">
-          <span className="bubble clay clay--sky" />
-          <span className="bubble bubble--me clay clay--mango" />
-          <span className="bubble clay clay--sky bubble--short" />
+          <span className="sk sk--bubble" />
+          <span className="sk sk--bubble sk--me" />
+          <span className="sk sk--bubble sk--short" />
           <span className="wave">
-            {[6, 14, 22, 12, 18, 8, 16, 10].map((h, i) => (
+            {[6, 14, 22, 12, 18, 8, 16, 10, 20, 9].map((h, i) => (
               <i key={i} style={{ height: h }} />
             ))}
+          </span>
+          <span className="sk sk--input">
+            <i />
           </span>
         </div>
       )
@@ -318,7 +277,7 @@ function ProjectArt({ art }: { art: Art }) {
       return (
         <div className="art art--tiles">
           {['Aa', 'अ', 'ಕ', '文', 'Ñ', 'ع'].map((t, i) => (
-            <span key={t} className={`letter-tile wood ${i % 2 ? 'wood--walnut' : ''}`} style={{ '--r': `${(i % 3) * 4 - 4}deg` } as CSSProperties}>
+            <span key={t} className={`letter-tile wood ${i % 2 ? 'wood--walnut' : ''}`} style={{ '--r': `${(i % 3) * 3 - 3}deg` } as CSSProperties}>
               {t}
             </span>
           ))}
@@ -327,29 +286,29 @@ function ProjectArt({ art }: { art: Art }) {
     case 'steps':
       return (
         <div className="art art--steps">
-          <svg viewBox="0 0 200 60" className="string" preserveAspectRatio="none">
-            <path d="M20 30 C 60 6, 80 54, 100 30 S 150 6, 180 30" />
-          </svg>
-          <span className="bead clay clay--sage">1</span>
-          <span className="bead clay clay--sage">2</span>
-          <span className="bead clay clay--mango">3</span>
+          {[1, 2, 3].map(n => (
+            <span key={n} className={`step ${n === 3 ? 'is-now' : ''}`}>
+              <b>{n}</b>
+              <i />
+            </span>
+          ))}
         </div>
       )
     case 'grid':
       return (
         <div className="art art--grid">
           {Array.from({ length: 15 }, (_, i) => (
-            <span key={i} className={`grid-block wood ${[2, 6, 7, 11].includes(i) ? 'clay clay--terracotta' : ''} ${[4, 9].includes(i) ? 'wood--walnut' : ''}`} />
+            <span key={i} className={`cell ${[2, 6, 7, 11].includes(i) ? 'is-on' : ''}`} />
           ))}
         </div>
       )
     case 'bars':
       return (
         <div className="art art--bars">
-          <span className="hero-num clay clay--mango" />
+          <span className="sk sk--big" />
           <div className="bars">
             {[38, 56, 44, 72, 64].map((h, i) => (
-              <i key={i} className={`clay ${i === 3 ? 'clay--terracotta' : 'clay--sage'}`} style={{ height: `${h}%` }} />
+              <i key={i} className={i === 3 ? 'is-on' : ''} style={{ height: `${h}%` }} />
             ))}
           </div>
         </div>
@@ -363,7 +322,7 @@ function ProjectArt({ art }: { art: Art }) {
               <span className="field-line" />
             </div>
           ))}
-          <span className="submit clay clay--sky" />
+          <span className="sk sk--btn" />
         </div>
       )
   }
@@ -372,7 +331,7 @@ function ProjectArt({ art }: { art: Art }) {
 function ProjectCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
   const [flipped, setFlipped] = useState(false)
   return (
-    <li className="project" data-reveal style={{ '--r': `${p.tilt}deg`, '--d': `${(i % 3) * 90}ms` } as CSSProperties}>
+    <li className={`project ${p.featured ? 'project--big' : ''}`} data-reveal style={{ '--d': `${(i % 4) * 70}ms` } as CSSProperties}>
       <button
         type="button"
         className={`project__flip ${flipped ? 'is-flipped' : ''}`}
@@ -384,22 +343,20 @@ function ProjectCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
         }}
       >
         <span className="project__face project__front cardboard">
-          <Tape className="tape--corner" />
           <span className="project__screen paper">
             <ProjectArt art={p.art} />
           </span>
           <span className="project__meta">
             <span className="project__title">{p.title}</span>
-            <span className="project__where stencil">{p.where}</span>
+            <span className="project__where">{p.where}</span>
           </span>
-          <span className="project__turn marker" aria-hidden="true">
-            flip ↻
+          <span className="project__turn" aria-hidden="true">
+            ↻
           </span>
         </span>
         <span className="project__face project__back cardboard cardboard--inside" aria-hidden={!flipped}>
-          <Tape className="tape--top" />
-          <span className="project__note marker">{p.note}</span>
-          <span className="project__soon stencil">full story: being written</span>
+          <span className="project__note">{p.note}</span>
+          <span className="project__soon">Full story being written</span>
         </span>
       </button>
     </li>
@@ -409,14 +366,13 @@ function ProjectCard({ p, i }: { p: (typeof projects)[number]; i: number }) {
 function Work() {
   return (
     <section id="work" className="section" aria-labelledby="work-title">
-      <BoxLabel n={2}>work</BoxLabel>
+      <ShippingLabel n={1}>work</ShippingLabel>
       <div className="section__head">
         <h2 id="work-title" data-reveal>
-          Prototypes from <br className="hide-sm" />
-          my desk
+          Prototypes from my desk
         </h2>
-        <p className="section__aside marker" data-reveal>
-          tap a card to flip it over
+        <p className="section__aside" data-reveal>
+          Six projects from WeCP and Invisible Technologies. Tap a card to turn it over.
         </p>
       </div>
       <ul className="projects">
@@ -424,9 +380,12 @@ function Work() {
           <ProjectCard key={p.title} p={p} i={i} />
         ))}
       </ul>
-      <div className="small-things" data-reveal>
-        <p className="stencil">plus a drawer of smaller fixes</p>
-        <ul>
+      <div className="drawer" data-reveal>
+        <div className="drawer__front wood wood--walnut">
+          <span className="drawer__pull" aria-hidden="true" />
+          <p className="drawer__label">and a drawer of smaller fixes</p>
+        </div>
+        <ul className="drawer__tags">
           {smallThings.map((s, i) => (
             <li key={s} className="label-tape" style={{ '--r': `${((i * 7) % 5) - 2}deg` } as CSSProperties}>
               {s}
@@ -439,40 +398,36 @@ function Work() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  03  How I work: clay you can push around                           */
+/*  How I work: wooden tokens you can push around                      */
 /* ------------------------------------------------------------------ */
 
-function ClayBlob({ label, color, i }: { label: string; color: string; i: number }) {
+function Token({ t, i }: { t: (typeof tokens)[number]; i: number }) {
   const [pos, setPos] = useState({ x: 0, y: 0 })
   const [dragging, setDragging] = useState(false)
-  const [squish, setSquish] = useState(0)
-  const start = useRef({ px: 0, py: 0, x: 0, y: 0, moved: false })
+  const start = useRef({ px: 0, py: 0, x: 0, y: 0 })
 
   const down = (e: ReactPointerEvent<HTMLButtonElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
-    start.current = { px: e.clientX, py: e.clientY, x: pos.x, y: pos.y, moved: false }
+    start.current = { px: e.clientX, py: e.clientY, x: pos.x, y: pos.y }
     setDragging(true)
+    sound.tok()
   }
   const move = (e: ReactPointerEvent<HTMLButtonElement>) => {
     if (!dragging) return
-    const dx = e.clientX - start.current.px
-    const dy = e.clientY - start.current.py
-    if (Math.abs(dx) + Math.abs(dy) > 4) start.current.moved = true
-    setPos({ x: start.current.x + dx, y: start.current.y + dy })
+    setPos({ x: start.current.x + e.clientX - start.current.px, y: start.current.y + e.clientY - start.current.py })
   }
   const up = () => {
     if (!dragging) return
     setDragging(false)
-    setSquish(s => s + 1)
-    sound.squish()
+    sound.tok()
   }
 
   return (
-    <li className="blob-slot" data-reveal style={{ '--d': `${i * 60}ms` } as CSSProperties}>
+    <li className="token-slot" data-reveal style={{ '--d': `${i * 50}ms` } as CSSProperties}>
       <button
         type="button"
-        className={`blob clay clay--${color} ${dragging ? 'is-dragging' : ''}`}
-        style={{ '--x': `${pos.x}px`, '--y': `${pos.y}px`, '--shape': i % 4 } as CSSProperties}
+        className={`token ${t.dark ? 'token--dark' : ''} ${dragging ? 'is-dragging' : ''}`}
+        style={{ '--x': `${pos.x}px`, '--y': `${pos.y}px`, '--r': `${t.r}deg`, width: Math.round(t.w * 0.25) } as CSSProperties}
         onPointerDown={down}
         onPointerMove={move}
         onPointerUp={up}
@@ -480,14 +435,12 @@ function ClayBlob({ label, color, i }: { label: string; color: string; i: number
         onKeyDown={e => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault()
-            setSquish(s => s + 1)
-            sound.squish()
+            sound.tok()
           }
         }}
       >
-        <span key={squish} className={squish ? 'blob__inner is-squished' : 'blob__inner'}>
-          {label}
-        </span>
+        <img src={t.img} alt="" draggable={false} />
+        <span>{t.label}</span>
       </button>
     </li>
   )
@@ -496,38 +449,36 @@ function ClayBlob({ label, color, i }: { label: string; color: string; i: number
 function How() {
   return (
     <section id="how" className="section section--how" aria-labelledby="how-title">
-      <BoxLabel n={3}>how I work</BoxLabel>
-      <div className="section__head">
-        <h2 id="how-title" data-reveal>
-          Things I’m
-          <br className="hide-sm" /> good at
-        </h2>
-        <p className="section__aside marker" data-reveal>
-          the clay is still soft. drag it around
-        </p>
-      </div>
-      <div className="clay-board plywood" data-reveal>
-        <ul className="blobs">
-          {blobs.map((b, i) => (
-            <ClayBlob key={b.label} {...b} i={i} />
+      <div className="how">
+        <div className="how__copy">
+          <h2 id="how-title" data-reveal>
+            How I work
+          </h2>
+          <p data-reveal>
+            I work closely with product, engineering and research, and I like owning the messy middle: the states, the edge cases and the words on the buttons.
+          </p>
+          <p className="marker how__hint" data-reveal>
+            the tokens slide, try one
+          </p>
+        </div>
+        <ul className="tokens">
+          {tokens.map((t, i) => (
+            <Token key={t.label} t={t} i={i} />
           ))}
         </ul>
-        <p className="clay-board__note marker">
-          I work closely with product, engineering and research, and I like owning the messy middle: the states, the edge cases and the words on the buttons.
-        </p>
       </div>
     </section>
   )
 }
 
 /* ------------------------------------------------------------------ */
-/*  04  On the field: throw the disc                                   */
+/*  On the field: throw the disc                                       */
 /* ------------------------------------------------------------------ */
 
 function Field({ reduced }: { reduced: boolean }) {
   const field = useRef<HTMLDivElement>(null)
   const disc = useRef<HTMLButtonElement>(null)
-  const state = useRef({ x: 0.16, y: 0.5, vx: 0, vy: 0, spin: 0, dragging: false, thrown: false, trail: [] as { x: number; y: number; t: number }[] })
+  const state = useRef({ x: 0.14, y: 0.5, vx: 0, vy: 0, spin: 0, dragging: false, thrown: false, trail: [] as { x: number; y: number; t: number }[] })
   const raf = useRef(0)
   const [points, setPoints] = useState(0)
   const [cheer, setCheer] = useState(false)
@@ -547,7 +498,7 @@ function Field({ reduced }: { reduced: boolean }) {
     window.setTimeout(() => setCheer(false), 1600)
     window.setTimeout(() => {
       const s = state.current
-      s.x = 0.16
+      s.x = 0.14
       s.y = 0.5
       s.spin = 0
       paint()
@@ -558,10 +509,8 @@ function Field({ reduced }: { reduced: boolean }) {
     const s = state.current
     const f = field.current
     if (!f) return
-    const w = f.clientWidth
-    const h = f.clientHeight
-    s.x += s.vx / w
-    s.y += s.vy / h
+    s.x += s.vx / f.clientWidth
+    s.y += s.vy / f.clientHeight
     s.vx *= 0.975
     s.vy *= 0.975
     s.spin += Math.hypot(s.vx, s.vy) * 2.2
@@ -577,9 +526,8 @@ function Field({ reduced }: { reduced: boolean }) {
       sound.tap()
     }
     paint()
-    if (Math.hypot(s.vx, s.vy) > 0.25) {
-      raf.current = requestAnimationFrame(step)
-    } else if (s.thrown) {
+    if (Math.hypot(s.vx, s.vy) > 0.25) raf.current = requestAnimationFrame(step)
+    else if (s.thrown) {
       s.thrown = false
       if (s.x > 0.82) score()
     }
@@ -634,7 +582,7 @@ function Field({ reduced }: { reduced: boolean }) {
       score()
       return
     }
-    s.x = 0.16
+    s.x = 0.14
     s.y = 0.5
     s.vx = 34
     s.vy = (Math.random() - 0.5) * 6
@@ -645,90 +593,104 @@ function Field({ reduced }: { reduced: boolean }) {
 
   return (
     <section id="field" className="section" aria-labelledby="field-title">
-      <BoxLabel n={4}>on the field</BoxLabel>
+      <ShippingLabel n={2}>on the field</ShippingLabel>
       <div className="section__head">
         <h2 id="field-title" data-reveal>
-          Ultimate frisbee
-          <br className="hide-sm" /> takes up my weekends
+          Weekends are for Ultimate frisbee
         </h2>
-        <p className="section__aside marker" data-reveal>
-          {reduced ? 'press the disc to score' : 'grab the disc and fling it into the end zone'}
+        <p className="section__aside" data-reveal>
+          {reduced ? 'Press the disc to score a point.' : 'Grab the disc and fling it into the end zone.'}
         </p>
       </div>
 
-      <div className="pitch-wrap" data-reveal>
-        <div className="pitch felt" ref={field}>
-          <span className="pitch__line pitch__line--l" aria-hidden="true" />
-          <span className="pitch__line pitch__line--r" aria-hidden="true" />
-          <span className="pitch__zone marker" aria-hidden="true">
-            end zone
-          </span>
-          {[
-            [0.38, 0.28, 'mango'],
-            [0.55, 0.66, 'mango'],
-            [0.68, 0.34, 'rose'],
-          ].map(([x, y, c], i) => (
-            <span key={i} className={`player clay clay--${c}`} style={{ left: `${(x as number) * 100}%`, top: `${(y as number) * 100}%` }} aria-hidden="true">
-              <i className={`clay clay--${c}`} />
+      <div className="field-grid">
+        <div className="pitch-wrap wood" data-reveal>
+          <div className="pitch felt" ref={field}>
+            <span className="pitch__line pitch__line--l" aria-hidden="true" />
+            <span className="pitch__line pitch__line--r" aria-hidden="true" />
+            <span className="pitch__zone" aria-hidden="true">
+              end zone
             </span>
-          ))}
-          <button
-            ref={disc}
-            type="button"
-            className="disc clay clay--sky"
-            aria-label={`Frisbee. Press Enter to throw it. Points scored: ${points}`}
-            onPointerDown={down}
-            onPointerMove={move}
-            onPointerUp={up}
-            onPointerCancel={up}
-            onClick={e => {
-              if (e.detail === 0 || reduced) keyThrow()
-            }}
-          >
-            <span />
-          </button>
-          <p className={`pitch__cheer marker ${cheer ? 'is-on' : ''}`} aria-live="polite">
-            {cheer ? 'point!' : ''}
-          </p>
-          <p className="pitch__score label-tape">points: {points}</p>
+            {[
+              [0.4, 0.26, pegA],
+              [0.56, 0.68, pegA],
+              [0.7, 0.36, pegB],
+            ].map(([x, y, src], i) => (
+              <img key={i} className="peg" src={src as string} alt="" style={{ left: `${(x as number) * 100}%`, top: `${(y as number) * 100}%` }} />
+            ))}
+            <button
+              ref={disc}
+              type="button"
+              className="disc"
+              aria-label={`Frisbee. Press Enter to throw it. Points scored: ${points}`}
+              onPointerDown={down}
+              onPointerMove={move}
+              onPointerUp={up}
+              onPointerCancel={up}
+              onClick={e => {
+                if (e.detail === 0 || reduced) keyThrow()
+              }}
+            >
+              <span />
+            </button>
+            <p className={`pitch__cheer marker ${cheer ? 'is-on' : ''}`} aria-live="polite">
+              {cheer ? 'point!' : ''}
+            </p>
+            <p className="pitch__score">
+              Points <b>{points}</b>
+            </p>
+          </div>
         </div>
-        <Tape className="tape--pitch-a" />
-        <Tape className="tape--pitch-b" />
-      </div>
 
-      <ul className="notes">
-        <li className="note paper" data-reveal style={{ '--r': '-2.1deg' } as CSSProperties}>
-          <Tape className="tape--top" />
-          <span className="stencil">since Oct 2026</span>
-          <p><strong>Captain</strong> at Learning to Fly (L2F), Bengaluru</p>
-        </li>
-        <li className="note paper" data-reveal style={{ '--r': '1.4deg', '--d': '80ms' } as CSSProperties}>
-          <Tape className="tape--top" />
-          <span className="stencil">Oct 2026</span>
-          <p>Played the <strong>Pan-Asia</strong> tournament in Hong Kong</p>
-        </li>
-        <li className="note paper" data-reveal style={{ '--r': '-0.7deg', '--d': '160ms' } as CSSProperties}>
-          <Tape className="tape--top" />
-          <span className="stencil">coaching</span>
-          <p>Level 1 coaching, and I plan practices: <strong>short throws, break-marks, resets</strong></p>
-        </li>
-        <li className="note paper" data-reveal style={{ '--r': '2.1deg', '--d': '240ms' } as CSSProperties}>
-          <Tape className="tape--top" />
-          <span className="stencil">training</span>
-          <p>Track <strong>sprints</strong> three times a week, plus the gym</p>
-        </li>
-      </ul>
+        <ul className="cards">
+          <li className="card paper" data-reveal>
+            <span className="card__k">Since Oct 2026</span>
+            <p>
+              <strong>Captain</strong> at Learning to Fly (L2F), Bengaluru
+            </p>
+          </li>
+          <li className="card paper" data-reveal style={{ '--d': '70ms' } as CSSProperties}>
+            <span className="card__k">Oct 2026</span>
+            <p>
+              Played the <strong>Pan-Asia</strong> tournament in Hong Kong
+            </p>
+          </li>
+          <li className="card paper" data-reveal style={{ '--d': '140ms' } as CSSProperties}>
+            <span className="card__k">Coaching</span>
+            <p>
+              <strong>Level 1 coaching.</strong> I plan drills for short throws, break-marks and resets
+            </p>
+          </li>
+          <li className="card paper" data-reveal style={{ '--d': '210ms' } as CSSProperties}>
+            <span className="card__k">Training</span>
+            <p>
+              Track <strong>sprints</strong> three times a week, plus the gym
+            </p>
+          </li>
+        </ul>
+      </div>
 
       <div className="kit" data-reveal>
         <div className="kit__jersey">
-          <svg viewBox="0 0 220 220" role="img" aria-label="A cardboard cut-out of an ivory jersey with gold street-map lines and a red flower">
+          <svg viewBox="0 0 220 220" role="img" aria-label="A cut-out of an ivory jersey with gold street-map lines and a red flower">
             <defs>
               <clipPath id="jersey-shape">
                 <path d="M70 18 Q110 40 150 18 L198 44 L182 92 L160 84 L162 204 L58 204 L60 84 L38 92 L22 44 Z" />
               </clipPath>
+              <filter id="paperish">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" result="n" />
+                <feColorMatrix in="n" values="0 0 0 0 0.4  0 0 0 0 0.3  0 0 0 0 0.2  0 0 0 0.12 0" result="g" />
+                <feComposite in="g" in2="SourceGraphic" operator="in" result="gi" />
+                <feMerge>
+                  <feMergeNode in="SourceGraphic" />
+                  <feMergeNode in="gi" />
+                </feMerge>
+              </filter>
             </defs>
-            <path className="kit__shadow" d="M74 24 Q114 46 154 24 L202 50 L186 98 L164 90 L166 210 L62 210 L64 90 L42 98 L26 50 Z" />
-            <path className="kit__base" d="M70 18 Q110 40 150 18 L198 44 L182 92 L160 84 L162 204 L58 204 L60 84 L38 92 L22 44 Z" />
+            <path className="kit__board" d="M74 23 Q114 45 154 23 L203 49 L187 97 L165 89 L167 209 L63 209 L65 89 L43 97 L27 49 Z" />
+            <g filter="url(#paperish)">
+              <path className="kit__base" d="M70 18 Q110 40 150 18 L198 44 L182 92 L160 84 L162 204 L58 204 L60 84 L38 92 L22 44 Z" />
+            </g>
             <g clipPath="url(#jersey-shape)" className="kit__map">
               <path d="M40 60 L120 120 L200 90 M60 200 L100 110 L90 40 M150 210 L130 130 L190 150 M20 140 L110 150 L170 60" />
               <path d="M70 170 Q 100 160 140 180 M80 70 Q 120 90 160 70" />
@@ -742,19 +704,17 @@ function Field({ reduced }: { reduced: boolean }) {
             <path className="kit__collar" d="M70 18 Q110 40 150 18" />
           </svg>
         </div>
-        <p className="kit__text">
-          <span className="stencil">side project</span>
-          <span className="marker">
-            Kit concepts for L2F’s Hong Kong trip: an ivory base, fine gold street-map lines and a red flower.
-          </span>
-        </p>
+        <div className="kit__text">
+          <span className="card__k">Side project</span>
+          <p>Kit concepts for L2F’s Hong Kong trip: an ivory base, fine gold street-map lines and a red flower.</p>
+        </div>
       </div>
     </section>
   )
 }
 
 /* ------------------------------------------------------------------ */
-/*  05  Made by hand                                                   */
+/*  Made by hand                                                       */
 /* ------------------------------------------------------------------ */
 
 function Bakeable({ kind, label }: { kind: 'cookie' | 'brownie' | 'focaccia'; label: string }) {
@@ -781,42 +741,35 @@ function Making() {
   const [wobble, setWobble] = useState(0)
   return (
     <section id="making" className="section" aria-labelledby="making-title">
-      <BoxLabel n={5}>made by hand</BoxLabel>
+      <ShippingLabel n={3}>made by hand</ShippingLabel>
       <div className="section__head">
         <h2 id="making-title" data-reveal>
-          I like making
-          <br className="hide-sm" /> real things too
+          I like making real things too
         </h2>
-        <p className="section__aside marker" data-reveal>
-          go on, take a bite
+        <p className="section__aside" data-reveal>
+          Woodwork, baking and small experiments. The cookie is edible, sort of.
         </p>
       </div>
 
       <div className="shelf-unit">
         <div className="shelf" data-reveal>
           <div className="shelf__items">
-            <figure className="item">
+            <figure className="item item--cot">
               <button
                 type="button"
                 key={wobble}
                 className={`cot ${wobble ? 'is-wobbling' : ''}`}
-                aria-label="A tiny wooden four-poster cot. Press to give it a nudge."
+                aria-label="A small wooden four-poster cot. Press to give it a nudge."
                 onClick={() => {
                   sound.tok()
                   setWobble(w => w + 1)
                 }}
               >
-                <span className="cot__post wood wood--walnut" />
-                <span className="cot__post wood wood--walnut" />
-                <span className="cot__post wood wood--walnut cot__post--back" />
-                <span className="cot__post wood wood--walnut cot__post--back" />
-                <span className="cot__top wood" />
-                <span className="cot__frame wood" />
-                <span className="cot__mattress clay clay--rose" />
+                <img src={cotImg} alt="" width={909} height={691} draggable={false} />
               </button>
               <figcaption>
-                <span className="marker">a four-poster cot</span>
-                <span className="stencil">in progress, with a mentor</span>
+                <span className="item__name">Four-poster cot</span>
+                <span className="item__meta">in progress, with a mentor</span>
               </figcaption>
             </figure>
 
@@ -827,8 +780,8 @@ function Making() {
                 <Bakeable kind="focaccia" label="Focaccia" />
               </div>
               <figcaption>
-                <span className="marker">cookies, brownies, focaccia, apple pie</span>
-                <span className="stencil">still testing substitutions</span>
+                <span className="item__name">Cookies, brownies, focaccia, apple pie</span>
+                <span className="item__meta">still testing substitutions</span>
               </figcaption>
             </figure>
           </div>
@@ -842,25 +795,25 @@ function Making() {
                 <svg viewBox="0 0 200 50" preserveAspectRatio="none">
                   <path d="M4 10 Q 100 40 196 10" />
                 </svg>
-                {['sock', 'tee', 'cap'].map((t, i) => (
-                  <span key={t} className={`line__tag clay clay--${['sky', 'mango', 'sage'][i]}`} style={{ '--i': i } as CSSProperties} />
+                {['sky', 'mango', 'sage'].map((c, i) => (
+                  <span key={c} className={`line__tag clay clay--${c}`} style={{ '--i': i } as CSSProperties} />
                 ))}
               </div>
               <figcaption>
-                <span className="marker">a pocket travel clothesline</span>
-                <span className="stencil">an experiment</span>
+                <span className="item__name">Pocket travel clothesline</span>
+                <span className="item__meta">an experiment</span>
               </figcaption>
             </figure>
             <figure className="item">
               <div className="books" aria-hidden="true">
-                <span className="book clay clay--terracotta" />
-                <span className="book clay clay--sage book--tall" />
-                <span className="book clay clay--sky" />
-                <span className="book clay clay--mango book--lean" />
+                <span className="book book--a" />
+                <span className="book book--b" />
+                <span className="book book--c" />
+                <span className="book book--d" />
               </div>
               <figcaption>
-                <span className="marker">fantasy books, Eragon first</span>
-                <span className="stencil">on the reading shelf</span>
+                <span className="item__name">Fantasy books, Eragon first</span>
+                <span className="item__meta">on the reading shelf</span>
               </figcaption>
             </figure>
             <figure className="item">
@@ -868,8 +821,8 @@ function Making() {
                 <span className="paper" />
               </div>
               <figcaption>
-                <span className="marker">this website</span>
-                <span className="stencil">built by hand, in code</span>
+                <span className="item__name">This website</span>
+                <span className="item__meta">built by hand, in code</span>
               </figcaption>
             </figure>
           </div>
@@ -881,44 +834,39 @@ function Making() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  06  Right now                                                      */
+/*  Right now                                                          */
 /* ------------------------------------------------------------------ */
 
 const nowNotes = [
-  { k: 'leading', t: 'captaining L2F', r: -2.8, c: 'paper' },
-  { k: 'training', t: 'sprints, three times a week', r: 1.4, c: 'paper paper--mango' },
-  { k: 'building', t: 'a four-poster cot', r: -0.7, c: 'paper paper--sage' },
-  { k: 'writing', t: 'case studies for this site', r: 2.1, c: 'paper' },
+  { k: 'Leading', t: 'captaining L2F' },
+  { k: 'Training', t: 'sprints, three times a week' },
+  { k: 'Building', t: 'a four-poster cot' },
+  { k: 'Writing', t: 'case studies for this site' },
 ]
 
 function Now() {
   return (
-    <section id="now" className="section" aria-labelledby="now-title">
-      <BoxLabel n={6}>right now</BoxLabel>
-      <div className="section__head">
-        <h2 id="now-title" data-reveal>
-          Currently
-          <br className="hide-sm" /> pinned up
+    <section id="now" className="section section--now" aria-labelledby="now-title">
+      <div className="now">
+        <h2 id="now-title" className="now__title" data-reveal>
+          Right now
+          <span>Nov 2026</span>
         </h2>
-        <p className="section__aside marker" data-reveal>
-          updated Nov 2026
-        </p>
+        <ul className="now__list">
+          {nowNotes.map((n, i) => (
+            <li key={n.k} className="now__item" data-reveal style={{ '--d': `${i * 70}ms` } as CSSProperties}>
+              <span className="card__k">{n.k}</span>
+              <span className="marker">{n.t}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="cork cardboard">
-        {nowNotes.map((n, i) => (
-          <li key={n.k} className={`sticky ${n.c}`} data-reveal style={{ '--r': `${n.r}deg`, '--d': `${i * 90}ms` } as CSSProperties} onPointerEnter={() => sound.peel()}>
-            <span className="pin clay clay--terracotta" aria-hidden="true" />
-            <span className="stencil">{n.k}</span>
-            <span className="marker">{n.t}</span>
-          </li>
-        ))}
-      </ul>
     </section>
   )
 }
 
 /* ------------------------------------------------------------------ */
-/*  07  Say hi                                                         */
+/*  Say hi                                                             */
 /* ------------------------------------------------------------------ */
 
 function LostAndFound() {
@@ -961,28 +909,20 @@ function LostAndFound() {
 function SayHi() {
   return (
     <section id="hi" className="section section--hi" aria-labelledby="hi-title">
-      <BoxLabel n={7}>say hi</BoxLabel>
       <div className="hi cardboard" data-reveal>
-        <Tape className="tape--hi-a" />
-        <Tape className="tape--hi-b" />
-        <h2 id="hi-title">
-          Let’s make
-          <br /> something.
-        </h2>
-        <p className="marker hi__sub">on a screen, or on a workbench</p>
+        <Tape className="tape--hi" />
+        <h2 id="hi-title">Let’s make something.</h2>
+        <p className="hi__sub">On a screen, or on a workbench.</p>
         <div className="hi__links">
-          {CONTACT_EMAIL ? (
-            <a className="clay-btn clay clay--mango" href={`mailto:${CONTACT_EMAIL}`} onClick={() => sound.squish()}>
-              email me
-            </a>
-          ) : null}
-          <a className="clay-btn clay clay--sky" href={GITHUB_URL} target="_blank" rel="noreferrer" onClick={() => sound.squish()}>
+          <a className="btn" href={`mailto:${CONTACT_EMAIL}`} onClick={() => sound.tap()}>
+            Email me
+          </a>
+          <a className="btn btn--ghost" href={GITHUB_URL} target="_blank" rel="noreferrer" onClick={() => sound.tap()}>
             GitHub <span aria-hidden="true">↗</span>
           </a>
         </div>
-        {CONTACT_EMAIL ? <p className="hi__email stencil">{CONTACT_EMAIL}</p> : null}
+        <p className="hi__email">{CONTACT_EMAIL}</p>
       </div>
-      <LostAndFound />
     </section>
   )
 }
@@ -991,7 +931,7 @@ function SayHi() {
 
 export default function App() {
   const reduced = useReducedMotion()
-  const active = useActiveSection()
+  const progress = useScrollProgress()
   useReveal()
 
   return (
@@ -999,26 +939,27 @@ export default function App() {
       <a className="skip-link" href="#work">
         Skip to work
       </a>
+      <div className="progress" aria-hidden="true">
+        <span style={{ transform: `scaleX(${progress})` }} />
+      </div>
       <header className="topbar">
         <a href="#hello" className="stamp wood" onClick={() => sound.tok()}>
           neha nk
         </a>
         <nav aria-label="Main" className="tabs">
           {[
-            ['work', 'work'],
-            ['field', 'frisbee'],
-            ['making', 'making'],
-            ['hi', 'say hi'],
-          ].map(([id, label], i) => (
-            <a key={id} href={`#${id}`} className="tab label-tape" style={{ '--r': `${[-2, 1, -1, 2][i]}deg` } as CSSProperties} onClick={() => sound.peel()}>
+            ['work', 'Work'],
+            ['field', 'Frisbee'],
+            ['making', 'Making'],
+            ['hi', 'Say hi'],
+          ].map(([id, label]) => (
+            <a key={id} href={`#${id}`} className="tab" onClick={() => sound.tap()}>
               {label}
             </a>
           ))}
         </nav>
-        <SoundToggle />
       </header>
-
-      <Ruler active={active} />
+      <SoundToggle />
 
       <main>
         <Hero reduced={reduced} />
@@ -1031,11 +972,13 @@ export default function App() {
       </main>
 
       <footer className="footer">
-        <p className="marker">
-          bye-bye <span className="wave-hand" aria-hidden="true">✋</span>
+        <p className="footer__bye">
+          Thanks for scrolling. <span className="marker">bye-bye</span>
         </p>
-        <p className="stencil">cardboard, tape, clay &amp; code · neha nk · 2026</p>
+        <LostAndFound />
+        <p className="footer__small">Cardboard, tape, wood, clay and code. Neha NK, 2026.</p>
       </footer>
     </div>
   )
 }
+
