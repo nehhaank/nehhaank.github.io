@@ -18,8 +18,6 @@ import pegB from './assets/obj/pegB.webp'
 import token22 from './assets/obj/token22.webp'
 import token30 from './assets/obj/token30.webp'
 import token38 from './assets/obj/token38.webp'
-import token30w from './assets/obj/token30w.webp'
-import token38w from './assets/obj/token38w.webp'
 
 /* ------------------------------------------------------------------ */
 /*  Content. Kept short on purpose: the site should be fun to scroll.  */
@@ -32,7 +30,7 @@ type Art = 'chat' | 'tiles' | 'steps' | 'grid' | 'bars' | 'form'
 
 const projects: { title: string; where: string; art: Art; note: string; featured?: boolean; facts?: [string, string][] }[] = [
   { title: 'AI Interviewer', where: 'WeCP', art: 'chat', featured: true, note: 'Helped shape the first AI interviewer, then structured vs. adaptive modes and multiple interviewers. The puzzle: make an unfamiliar AI conversation easy to understand and set up.', facts: [['2 modes', 'Structured for consistency, adaptive for deep dives'], ['1 → many', 'From one AI interviewer to a panel'], ['Tested', 'Shaped through user interviews and testing']] },
-  { title: 'Tests in any language', where: 'WeCP', art: 'tiles', featured: true, note: 'Language choice, fallbacks, switching mid-test and translated reports, so a candidate anywhere gets the same fair test.', facts: [['7 pieces', 'Pick, fallback, switch, lock, label, survey, report'], ['Side by side', 'Original answers kept next to translations'], ['Admin rules', 'Auto-detect, or restrict the languages offered']] },
+  { title: 'Tests in any language', where: 'WeCP', art: 'tiles', featured: true, note: 'Language choice, fallbacks, switching mid-test and translated reports, so a candidate anywhere gets the same fair test.', facts: [['7 pieces', 'Pick, fallback, switch, lock, label, survey, report'], ['Side by side', 'Original answers kept next to translations'], ['Auto-detect', 'Or let admins restrict which languages are offered']] },
   { title: 'Candidate onboarding', where: 'WeCP', art: 'steps', note: 'Reworked registration, with an AI-forward welcome, to take the friction out of the minutes before a test begins.' },
   { title: 'Capacity planner', where: 'Invisible Technologies', art: 'grid', note: 'A dense internal planner rebuilt around one grid: switch views by profile, work type or cohort, expand rows inline, and read outputs right below.' },
   { title: 'Savings dashboard', where: 'Invisible Technologies', art: 'bars', note: 'Made modeled savings readable and traceable: a hero number, with-and-without comparisons, period picker, baseline assumptions and the full calculation.' },
@@ -43,9 +41,9 @@ const smallThings = ['Report integrity', 'Proctoring status language', 'Section 
 
 const tokens: { label: string; img: string; w: number; dark?: boolean; r: number }[] = [
   { label: 'Complex workflows', img: token38, w: 974, r: -1 },
-  { label: 'Edge cases', img: token30w, w: 861, dark: true, r: 1.5 },
+  { label: 'Edge cases', img: token30, w: 861, r: 1.5 },
   { label: 'Data viz', img: token22, w: 740, r: -0.5 },
-  { label: 'Systems thinking', img: token38w, w: 974, dark: true, r: 0.8 },
+  { label: 'Systems thinking', img: token38, w: 974, r: 0.8 },
   { label: 'UX writing', img: token30, w: 861, r: -1.2 },
   { label: 'Research', img: token22, w: 740, r: 1 },
   { label: 'AI interactions', img: token38, w: 974, r: 0.6 },
@@ -158,7 +156,8 @@ function SoundToggle() {
 /*  Hello                                                              */
 /* ------------------------------------------------------------------ */
 
-const greetings = ['hello!', 'welcome in', 'mind the tape', 'press again?', 'ok, now scroll ↓']
+const greetings = ['hello!', 'one down', 'two down', 'nearly there', 'ok, now scroll ↓']
+const todo = ['untangle the flow', 'name the button', 'test the edge case', 'ship it']
 
 function Hero({ reduced }: { reduced: boolean }) {
   const stage = useRef<HTMLDivElement>(null)
@@ -225,11 +224,14 @@ function Hero({ reduced }: { reduced: boolean }) {
             <p className="phone__greet marker" aria-live="polite">
               {greetings[g]}
             </p>
-            <div className="phone__lines" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </div>
+            <ul className="phone__todo" aria-label="Today's list">
+              {todo.map((t, i) => (
+                <li key={t} className={i < g ? 'is-done' : ''}>
+                  <span aria-hidden="true" />
+                  {t}
+                </li>
+              ))}
+            </ul>
             <button
               type="button"
               className={`phone__btn clay clay--terracotta ${pressed ? 'is-pressed' : ''}`}
@@ -413,7 +415,7 @@ function ProjectArt({ art }: { art: Art }) {
 
 function Feature({ p, i }: { p: (typeof projects)[number]; i: number }) {
   return (
-    <li className={`feature ${i % 2 ? 'feature--flip' : ''}`} data-reveal>
+    <li className="feature" data-reveal>
       <div className="feature__sheet">
         <span className="feature__pin" aria-hidden="true" />
         <div className="project__screen feature__screen">
@@ -481,23 +483,7 @@ function Work() {
   return (
     <section id="work" className="mat-wrap" aria-labelledby="work-title">
       <div className="mat">
-        <span className="mat__ruler" aria-hidden="true">
-          {Array.from({ length: 9 }, (_, i) => (
-            <b key={i} style={{ left: i * 160 }}>
-              {i * 5}
-            </b>
-          ))}
-        </span>
-        <span className="mat__ruler mat__ruler--side" aria-hidden="true">
-          {Array.from({ length: 12 }, (_, i) => (
-            <b key={i} style={{ top: i * 160 }}>
-              {i * 5}
-            </b>
-          ))}
-        </span>
-        <span className="mat__print" aria-hidden="true">
-          Self-healing · 5 mm grid
-        </span>
+        <span className="mat__ruler" aria-hidden="true" />
         <div className="mat__inner">
           <Kicker n={1}>Work</Kicker>
           <div className="section__head">
@@ -735,7 +721,6 @@ function Field({ reduced }: { reduced: boolean }) {
 
   return (
     <section id="field" className="section" aria-labelledby="field-title">
-      <Kicker n={2}>On the field</Kicker>
       <div className="section__head section__head--split">
         <h2 id="field-title" data-reveal>
           Weekends are for Ultimate frisbee
@@ -892,11 +877,13 @@ function Making() {
   const [wobble, setWobble] = useState(0)
   return (
     <section id="making" className="section" aria-labelledby="making-title">
-      <Kicker n={3}>Made by hand</Kicker>
-      <div className="section__head section__head--big">
+      <div className="section__head section__head--split">
         <h2 id="making-title" data-reveal>
           I like making real things too
         </h2>
+        <p className="section__aside" data-reveal>
+          Woodwork with a mentor, a lot of baking, and the odd travel gadget. Everything on these shelves responds to a tap.
+        </p>
       </div>
 
       <div className="shelves">
@@ -1046,8 +1033,8 @@ export default function App() {
             </a>
           ))}
         </nav>
+        <SoundToggle />
       </header>
-      <SoundToggle />
 
       <main>
         <Hero reduced={reduced} />

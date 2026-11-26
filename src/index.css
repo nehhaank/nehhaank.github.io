@@ -2368,3 +2368,72 @@ h2 { letter-spacing: -0.012em; }
 .facts dt { font-size: 1.35rem; font-weight: 800; letter-spacing: -0.015em; color: var(--mango); }
 .facts dd { margin: 6px 0 0; font-size: 0.86rem; line-height: 1.4; color: rgba(243, 235, 221, 0.78); }
 @media (max-width: 520px) { .facts { grid-template-columns: 1fr; } }
+
+/* ------------------------------------------------------------------ */
+/*  Round 6: restraint                                                 */
+/* ------------------------------------------------------------------ */
+/* two heading sizes: hero/closing, and one for every section */
+h2,
+#work-title,
+#how-title,
+#field-title,
+.section__head--big h2 { font-size: clamp(2.5rem, 4.8vw, 4.2rem); line-height: 0.98; max-width: none; }
+.kicker::after { display: none; }
+
+/* sticky top bar with sound inside */
+.topbar {
+  position: fixed;
+  inset: 0 0 auto 0;
+  max-width: none;
+  padding: 14px max(clamp(16px, 4vw, 48px), calc((100vw - 1240px) / 2 + 48px));
+  background: rgba(239, 227, 204, 0.82);
+  backdrop-filter: blur(10px) saturate(1.1);
+  -webkit-backdrop-filter: blur(10px) saturate(1.1);
+  box-shadow: 0 1px 0 rgba(43, 33, 26, 0.1);
+}
+.topbar .sound-toggle { position: static; margin-left: auto; box-shadow: inset 0 0 0 1px rgba(80, 50, 20, 0.14); }
+.plate { width: 112px; }
+.hero { padding-top: 140px; }
+.progress { z-index: 80; }
+
+/* hero: to-do on the screen, highlight under the whole word */
+.phone__todo { display: flex; flex-direction: column; gap: 10px; font-size: clamp(0.78rem, 1.05vw, 0.92rem); }
+.phone__todo li { display: flex; align-items: center; gap: 9px; color: var(--ink-soft); transition: color 0.3s; }
+.phone__todo li span {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1.5px rgba(43, 33, 26, 0.45);
+  transition: background 0.3s var(--ease), box-shadow 0.3s;
+}
+.phone__todo li.is-done { color: rgba(77, 61, 48, 0.55); text-decoration: line-through; text-decoration-color: rgba(201, 103, 63, 0.7); }
+.phone__todo li.is-done span { background: var(--terracotta); box-shadow: none; }
+.hl__stroke { left: -2%; width: 104%; bottom: 6%; height: 40%; }
+.hero__note { top: 64%; left: 80%; }
+.hero__note svg { transform: rotate(150deg) scaleY(-1); margin: 4px 0 0 -30px; }
+.hero__cursor { display: none; }
+
+/* mat: quieter, readable */
+.mat::before { display: none; }
+.mat__ruler--side, .mat__print { display: none; }
+.feature__note { font-size: 1.08rem; color: rgba(243, 235, 221, 0.92); }
+.facts dt { font-size: 1.5rem; }
+.facts dd { font-size: 0.92rem; color: rgba(243, 235, 221, 0.88); }
+.feature__sheet, .feature--flip .feature__sheet { rotate: -0.4deg; }
+.also { grid-template-columns: auto 1fr; align-items: baseline; }
+.also__list { font-size: 0.95rem; gap: 8px 24px; }
+
+/* tray: tidy rows */
+.tokens { justify-content: flex-start; padding-left: 2%; }
+.how__copy > p.how__hint { font-size: 0.85rem; }
+
+/* tighter run into the closing */
+.closing { margin-top: clamp(80px, 9vw, 128px); }
+.closing__inner { padding-bottom: 28px; }
+.footer { margin-top: clamp(72px, 8vw, 112px); }
+.hero__note { top: 92%; left: 64%; rotate: -3deg; }
+.hero__note svg { transform: rotate(200deg); margin: -64px 0 0 -40px; width: 56px; }
+.facts dt { font-size: 1.3rem; white-space: nowrap; }
+.hero__note { top: 84%; left: 77%; z-index: 5; rotate: -4deg; }
+.hero__note svg { display: block; transform: scaleX(-1) rotate(-25deg); margin: -58px 0 0 -54px; width: 58px; }
