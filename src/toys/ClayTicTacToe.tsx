@@ -7,12 +7,11 @@ import { sfx } from './sound'
 // Clay tic-tac-toe on a banana leaf. You play the bowls of Kaal soup; the board answers with Thatte idlis.
 // The leaf and the pieces are cut straight out of the photo of the real clay set.
 type Cell = 0 | 1 | 2 // empty, soup (you), idli
-// Where each square sits on the photo of the clay leaf (centre x, y and size, as % of the board's width).
-// The photo is at a slight angle, so the back row is a little smaller than the front.
+// Where each square sits on the photo of the clay leaf (centre x, y and size, as % of the board).
 const CELLS: [number, number, number][] = [
-  [40, 9, 20], [59.7, 12.5, 20], [78.4, 24, 20],
-  [31.7, 26, 22.5], [56.1, 31, 22.5], [77.8, 43, 22.5],
-  [19.9, 47, 25], [48.6, 60, 25], [76.4, 67, 25],
+  [21.5, 29.3, 23], [49.1, 29.3, 23], [76.6, 29.3, 23],
+  [21.5, 52.4, 23], [49.1, 52.4, 23], [76.6, 52.4, 23],
+  [21.5, 75.1, 23], [49.1, 75.1, 23], [76.6, 75.1, 23],
 ]
 const LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
 
