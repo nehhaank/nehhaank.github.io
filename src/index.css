@@ -705,9 +705,11 @@ main > section.hello { margin-top: clamp(112px, 13vw, 184px); background: none; 
 .fm-throw { stroke: var(--mustard); stroke-width: 4; }
 
 /* ---------- jasmine bloom (real frames) ---------- */
-.bloom-hit { width: 150px; height: 188px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 22px rgba(30, 40, 20, 0.22); }
-.bloom-hit:hover { transform: rotate(-1deg); }
-.bloom-photo { position: absolute; inset: 0; display: block; background-repeat: no-repeat; background-color: #20271c; }
-.bloom-ring { right: 8px; top: 8px; width: 30px !important; height: 30px !important; }
-.bloom-ring circle { stroke: rgba(255, 255, 255, 0.3); }
-.bloom-ring circle.on { stroke: #fff; }
+.bloom-hit { width: 172px; height: 166px; }
+.bloom-hit:hover { transform: rotate(-1.5deg); }
+.bloom-photo { position: absolute; inset: 0; display: block; filter: drop-shadow(0 8px 8px rgba(60, 50, 20, 0.18)); transform-origin: 50% 96%; }
+.bloom-hit.is-open .bloom-photo { animation: jas-breathe 4s ease-in-out infinite; }
+.bloom-frame { position: absolute; inset: 0; display: block; background-repeat: no-repeat; }
+.bloom-ring { right: -6px; top: 0; width: 30px !important; height: 30px !important; }
+@keyframes jas-breathe { 0%, 100% { transform: rotate(0) scale(1); } 50% { transform: rotate(1.2deg) scale(1.015); } }
+@media (prefers-reduced-motion: reduce) { .bloom-hit.is-open .bloom-photo { animation: none; } }

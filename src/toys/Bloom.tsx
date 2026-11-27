@@ -4,11 +4,22 @@ import { sfx } from './sound'
 
 // A real jasmine opening, frame by frame. Press and hold, and it opens;
 // let go too early and it closes again. Once it has fully opened it stays open.
-// The frames come from a video of a blooming jasmine, steadied on one flower and laid out
-// as a sprite sheet: COLS × ROWS tiles, FRAMES of them used, bud first.
-const COLS = 8
-const ROWS = 6
-const FRAMES = 46
+// The frames come from a video of a blooming jasmine: one flower, steadied, cut out of the
+// background and laid out as a sprite sheet of COLS × ROWS tiles, FRAMES of them used, bud first.
+// Neighbouring frames are crossfaded so the opening stays fluid at any speed.
+const COLS = 10
+const ROWS = 7
+const FRAMES = 69
+
+function tile(f: number): React.CSSProperties {
+  const col = f % COLS
+  const row = Math.floor(f / COLS)
+  return {
+    backgroundImage: `url(${sprite})`,
+    backgroundSize: `${COLS * 100}% ${ROWS * 100}%`,
+    backgroundPosition: `${(col / (COLS - 1)) * 100}% ${(row / (ROWS - 1)) * 100}%`,
+  }
+}
 
 export function Bloom() {
   const [p, setP] = useState(0)
@@ -51,9 +62,11 @@ export function Bloom() {
     setHeld(false)
   }
 
-  const f = Math.round(p * (FRAMES - 1))
-  const col = f % COLS
-  const row = Math.floor(f / COLS)
+  const ease = (x: number) => x * x * (3 - 2 * x)
+  const pos = ease(p) * (FRAMES - 1)
+  const f0 = Math.floor(pos)
+  const f1 = Math.min(FRAMES - 1, f0 + 1)
+  const mix = pos - f0
 
   return (
     <figure className="bloom">
@@ -68,15 +81,10 @@ export function Bloom() {
         onKeyUp={stop}
         aria-label={p >= 1 ? 'The jasmine is in bloom' : 'Press and hold to make the jasmine bloom'}
       >
-        <span
-          className="bloom-photo"
-          aria-hidden="true"
-          style={{
-            backgroundImage: `url(${sprite})`,
-            backgroundSize: `${COLS * 100}% ${ROWS * 100}%`,
-            backgroundPosition: `${(col / (COLS - 1)) * 100}% ${(row / (ROWS - 1)) * 100}%`,
-          }}
-        />
+        <span className="bloom-photo" aria-hidden="true">
+          <span className="bloom-frame" style={tile(f0)} />
+          <span className="bloom-frame" style={{ ...tile(f1), opacity: mix }} />
+        </span>
         {p > 0 && p < 1 && (
           <svg className="bloom-ring" viewBox="0 0 40 40" aria-hidden="true">
             <circle cx="20" cy="20" r="16" />
