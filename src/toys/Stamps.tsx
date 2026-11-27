@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import table from '../assets/stamps/table.webp'
 import notebook from '../assets/stamps/notebook.webp'
+import tin from '../assets/stamps/tin.webp'
 import { STAMP_DEFS, TABLE_ASPECT, type StampDef } from './stampsData'
 import { sfx } from './sound'
 
@@ -8,6 +9,7 @@ import { sfx } from './sound'
 // so it can be picked up on its own; pressing it on the notebook leaves its real print, cut from a
 // sheet of test prints she made with the same stamps. Her real ink pads sit beside the notebook:
 // tap one to change the ink. The eraser rubs the page clean from top to bottom.
+// The stamps start packed away in their tin: tip it and they pour out onto the table.
 const STAMP_IMG = import.meta.glob('../assets/stamps/stamp-*.webp', { eager: true, import: 'default' }) as Record<string, string>
 const INK_IMG = import.meta.glob('../assets/stamps/ink-*.webp', { eager: true, import: 'default' }) as Record<string, string>
 const stampSrc = (s: StampDef) => STAMP_IMG[`../assets/stamps/stamp-${String(s.id).padStart(2, '0')}.webp`]
@@ -46,6 +48,26 @@ export function Stamps() {
   const [held, setHeld] = useState<number | null>(null)
   const n = useRef(0)
   const erasing = wipe !== null
+  const [poured, setPoured] = useState(false)
+  const [fly, setFly] = useState<[number, number, number][] | null>(null)
+  const tinRef = useRef<HTMLButtonElement>(null)
+  const trayRef = useRef<HTMLDivElement>(null)
+
+  const pour = () => {
+    if (poured) return
+    setPoured(true)
+    sfx.glass()
+    for (let i = 0; i < 6; i++) window.setTimeout(() => sfx.clack(), 380 + i * 140 + Math.random() * 60)
+  }
+  // once the table is laid out, send each stamp flying from the mouth of the tin to its spot
+  useLayoutEffect(() => {
+    if (!poured || fly || !tinRef.current || !trayRef.current) return
+    const t = tinRef.current.getBoundingClientRect()
+    const r = trayRef.current.getBoundingClientRect()
+    const tx = t.left + t.width * 0.3
+    const ty = t.top + t.height * 0.45
+    setFly(STAMP_DEFS.map((d) => [tx - (r.left + ((d.x + d.w / 2) / 100) * r.width), ty - (r.top + ((d.y + d.h / 2) / 100) * r.height), (Math.random() - 0.5) * 540]))
+  }, [poured, fly])
 
   const pick = (s: StampDef) => {
     setHeld((h) => (h === s.id ? null : s.id))
@@ -94,13 +116,60 @@ export function Stamps() {
 
   return (
     <figure className="stamps">
-      <div className="stamps-tray" style={{ aspectRatio: TABLE_ASPECT }}>
+      <div className="stamps-desk">
+        <div className={`stamps-book${heldDef ? ' is-ready' : ''}`} onClick={stampAt}>
+          <img className="stamps-book-photo" src={notebook} alt="An open notebook with three ink pads beside it" draggable={false} />
+          <div
+            className="stamps-ink"
+            style={erasing ? { WebkitMaskImage: `linear-gradient(to bottom, transparent ${edge - 3}%, #000 ${edge + 3}%)`, maskImage: `linear-gradient(to bottom, transparent ${edge - 3}%, #000 ${edge + 3}%)` } : undefined}
+          >
+            {prints.map((p) => (
+              <span
+                key={p.k}
+                className="stamps-print"
+                style={{ left: `${p.x}%`, top: `${p.y}%`, width: `${p.w}%`, aspectRatio: p.ar, transform: `translate(-50%, -50%) rotate(${p.r}deg)`, opacity: p.o, background: p.c, WebkitMaskImage: `url(${p.src})`, maskImage: `url(${p.src})` }}
+                aria-hidden="true"
+              />
+            ))}
+          </div>
+          {press.map((p) => (
+            <span key={p.k} className="stamps-block" style={{ left: `${p.x}%`, top: `${p.y}%`, width: `calc(${p.w}% + 12px)`, aspectRatio: p.ar, ['--r' as string]: `${p.r}deg` }} aria-hidden="true" />
+          ))}
+          {PADS.map((pad, i) => (
+            <button
+              type="button"
+              key={pad.name}
+              className={`stamps-padhit${ink === i ? ' is-on' : ''}`}
+              style={{ left: `${pad.x}%`, top: `${pad.y}%`, width: `${pad.w}%`, height: `${pad.h}%`, transform: `translate(-50%, -50%) rotate(${pad.r}deg)` }}
+              onClick={(e) => {
+                e.stopPropagation()
+                setInk(i)
+                sfx.clack()
+              }}
+              aria-pressed={ink === i}
+              aria-label={`${pad.name} ink`}
+            />
+          ))}
+          {erasing && <span className="stamps-eraser is-wiping" style={{ top: `${edge}%`, left: `${56 + Math.sin(wipe! * 40) * 22}%` }} aria-hidden="true" />}
+          {prints.length === 0 && !erasing && (
+            <p className="stamps-empty">{heldDef ? `Now press the ${heldDef.name.toLowerCase()} on the page.` : poured ? 'Pick up a stamp from the table.' : 'Open the tin of stamps.'}</p>
+          )}
+        </div>
+        <button type="button" ref={tinRef} className={`stamps-tin${poured ? ' is-tipped' : ''}`} onClick={pour} disabled={poured} aria-label="Open the tin and pour out the stamps">
+          <img src={tin} alt="" draggable={false} />
+        </button>
+      </div>
+      {poured && (
+      <div className="stamps-tray" ref={trayRef} style={{ aspectRatio: TABLE_ASPECT }}>
         <img className="stamps-table" src={table} alt="" draggable={false} />
         {STAMP_DEFS.map((s) => (
           <span
             key={s.id}
-            className={`stamps-piece${held === s.id ? ' is-held' : ''}`}
-            style={{ left: `${s.x}%`, top: `${s.y}%`, width: `${s.w}%`, height: `${s.h}%` }}
+            className={`stamps-piece${held === s.id ? ' is-held' : ''}${fly ? ' is-pouring' : ' is-waiting'}`}
+            style={{
+              left: `${s.x}%`, top: `${s.y}%`, width: `${s.w}%`, height: `${s.h}%`,
+              ['--fx' as string]: `${fly?.[s.id][0] ?? 0}px`, ['--fy' as string]: `${fly?.[s.id][1] ?? 0}px`, ['--fr' as string]: `${fly?.[s.id][2] ?? 0}deg`, ['--d' as string]: `${300 + s.id * 38}ms`,
+            }}
           >
             <button
               type="button"
@@ -114,44 +183,7 @@ export function Stamps() {
           </span>
         ))}
       </div>
-      <div className={`stamps-book${heldDef ? ' is-ready' : ''}`} onClick={stampAt}>
-        <img className="stamps-book-photo" src={notebook} alt="An open notebook with three ink pads beside it" draggable={false} />
-        <div
-          className="stamps-ink"
-          style={erasing ? { WebkitMaskImage: `linear-gradient(to bottom, transparent ${edge - 3}%, #000 ${edge + 3}%)`, maskImage: `linear-gradient(to bottom, transparent ${edge - 3}%, #000 ${edge + 3}%)` } : undefined}
-        >
-          {prints.map((p) => (
-            <span
-              key={p.k}
-              className="stamps-print"
-              style={{ left: `${p.x}%`, top: `${p.y}%`, width: `${p.w}%`, aspectRatio: p.ar, transform: `translate(-50%, -50%) rotate(${p.r}deg)`, opacity: p.o, background: p.c, WebkitMaskImage: `url(${p.src})`, maskImage: `url(${p.src})` }}
-              aria-hidden="true"
-            />
-          ))}
-        </div>
-        {press.map((p) => (
-          <span key={p.k} className="stamps-block" style={{ left: `${p.x}%`, top: `${p.y}%`, width: `calc(${p.w}% + 12px)`, aspectRatio: p.ar, ['--r' as string]: `${p.r}deg` }} aria-hidden="true" />
-        ))}
-        {PADS.map((pad, i) => (
-          <button
-            type="button"
-            key={pad.name}
-            className={`stamps-padhit${ink === i ? ' is-on' : ''}`}
-            style={{ left: `${pad.x}%`, top: `${pad.y}%`, width: `${pad.w}%`, height: `${pad.h}%`, transform: `translate(-50%, -50%) rotate(${pad.r}deg)` }}
-            onClick={(e) => {
-              e.stopPropagation()
-              setInk(i)
-              sfx.clack()
-            }}
-            aria-pressed={ink === i}
-            aria-label={`${pad.name} ink`}
-          />
-        ))}
-        {erasing && <span className="stamps-eraser is-wiping" style={{ top: `${edge}%`, left: `${56 + Math.sin(wipe! * 40) * 22}%` }} aria-hidden="true" />}
-        {prints.length === 0 && !erasing && (
-          <p className="stamps-empty">{heldDef ? `Now press the ${heldDef.name.toLowerCase()} on the page.` : 'Pick up a stamp from the table.'}</p>
-        )}
-      </div>
+      )}
       <figcaption className="stamps-bar">
         <span className="stamps-now">
           <i style={{ background: PADS[ink].color }} aria-hidden="true" /> {PADS[ink].name} ink

@@ -741,3 +741,17 @@ main > section.hello { margin-top: clamp(112px, 13vw, 184px); background: none; 
 .stamps-eraser.is-wiping { animation: none; transform: translate(-50%, -50%) rotate(-8deg); transition: none; }
 .stamps-now { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
 .stamps-now i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.stamps-desk { display: flex; align-items: center; gap: 2%; width: min(100%, 900px); }
+.stamps-desk .stamps-book { flex: 0 0 76%; width: auto; }
+.stamps-tin { flex: 1 1 auto; padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 30% 90%; transition: transform 0.35s var(--spring); }
+.stamps-tin img { display: block; width: 100%; height: auto; filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.3)); user-select: none; }
+.stamps-tin:not(:disabled):hover { transform: translateY(-4px) rotate(-3deg); }
+.stamps-tin:disabled { cursor: default; }
+.stamps-tin.is-tipped { animation: tin-tip 2s var(--ease) both; }
+@keyframes tin-tip { 0% { transform: none; } 18% { transform: rotate(-62deg) translateX(-6%); } 70% { transform: rotate(-66deg) translateX(-6%); } 100% { transform: none; } }
+.stamps-piece.is-waiting { opacity: 0; }
+.stamps-piece.is-pouring { animation: stamp-pour 0.7s cubic-bezier(0.3, 0.6, 0.35, 1.15) var(--d) both; }
+@keyframes stamp-pour { 0% { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(0.5); } 12% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+.stamps-tray { width: min(100%, 900px); }
+@media (max-width: 640px) { .stamps-desk { flex-direction: column; } .stamps-desk .stamps-book { flex: none; width: 100%; } .stamps-tin { width: 40%; } }
+@media (prefers-reduced-motion: reduce) { .stamps-piece.is-pouring, .stamps-tin.is-tipped { animation-duration: 0.01s; } }
