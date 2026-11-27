@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import table from '../assets/stamps/table.webp'
 import notebook from '../assets/stamps/notebook.webp'
 import tin from '../assets/stamps/tin.webp'
@@ -9,7 +9,8 @@ import { sfx } from './sound'
 // so it can be picked up on its own; pressing it on the notebook leaves its real print, cut from a
 // sheet of test prints she made with the same stamps. Her real ink pads sit beside the notebook:
 // tap one to change the ink. The eraser rubs the page clean from top to bottom.
-// The stamps start packed away in their tin: tip it and they pour out onto the table.
+// The stamps start packed away in their tin, which sits on the table beside the notebook: tip it
+// and they pour out onto the table; tap it again and they all fly back in.
 const STAMP_IMG = import.meta.glob('../assets/stamps/stamp-*.webp', { eager: true, import: 'default' }) as Record<string, string>
 const INK_IMG = import.meta.glob('../assets/stamps/ink-*.webp', { eager: true, import: 'default' }) as Record<string, string>
 const stampSrc = (s: StampDef) => STAMP_IMG[`../assets/stamps/stamp-${String(s.id).padStart(2, '0')}.webp`]
@@ -33,7 +34,7 @@ const inPages = (x: number, y: number) => {
   return inside
 }
 // a print's width, as % of the photo's width, per pixel on the test sheet
-const PER_PX = 0.075
+const PER_PX = 0.105
 const MAX_PX = 210
 const ERASE_MS = 1900
 
@@ -48,26 +49,37 @@ export function Stamps() {
   const [held, setHeld] = useState<number | null>(null)
   const n = useRef(0)
   const erasing = wipe !== null
-  const [poured, setPoured] = useState(false)
-  const [fly, setFly] = useState<[number, number, number][] | null>(null)
-  const tinRef = useRef<HTMLButtonElement>(null)
+  // in: packed in the tin; pouring: flying out; out: on the table; packing: flying back in
+  const [phase, setPhase] = useState<'in' | 'pouring' | 'out' | 'packing'>('in')
+  const [fly, setFly] = useState<[number, number, number][]>([])
   const trayRef = useRef<HTMLDivElement>(null)
+  const timer = useRef(0)
+  useEffect(() => () => window.clearTimeout(timer.current), [])
+  const poured = phase !== 'in'
 
-  const pour = () => {
-    if (poured) return
-    setPoured(true)
-    sfx.glass()
-    for (let i = 0; i < 6; i++) window.setTimeout(() => sfx.clack(), 380 + i * 140 + Math.random() * 60)
+  // every stamp travels between its spot and the mouth of the tin, in the middle of the table
+  const aim = () => {
+    const r = trayRef.current!.getBoundingClientRect()
+    setFly(STAMP_DEFS.map((d) => [r.width * (0.5 - (d.x + d.w / 2) / 100), r.height * (0.42 - (d.y + d.h / 2) / 100), (Math.random() - 0.5) * 540]))
   }
-  // once the table is laid out, send each stamp flying from the mouth of the tin to its spot
-  useLayoutEffect(() => {
-    if (!poured || fly || !tinRef.current || !trayRef.current) return
-    const t = tinRef.current.getBoundingClientRect()
-    const r = trayRef.current.getBoundingClientRect()
-    const tx = t.left + t.width * 0.3
-    const ty = t.top + t.height * 0.45
-    setFly(STAMP_DEFS.map((d) => [tx - (r.left + ((d.x + d.w / 2) / 100) * r.width), ty - (r.top + ((d.y + d.h / 2) / 100) * r.height), (Math.random() - 0.5) * 540]))
-  }, [poured, fly])
+  const toggleTin = () => {
+    if (phase === 'in') {
+      aim()
+      setPhase('pouring')
+      sfx.glass()
+      for (let i = 0; i < 6; i++) window.setTimeout(() => sfx.clack(), 380 + i * 140 + Math.random() * 60)
+      timer.current = window.setTimeout(() => setPhase('out'), 300 + STAMP_DEFS.length * 38 + 800)
+    } else if (phase === 'out') {
+      aim()
+      setHeld(null)
+      setPhase('packing')
+      for (let i = 0; i < 6; i++) window.setTimeout(() => sfx.clack(), 650 + i * 130 + Math.random() * 60)
+      timer.current = window.setTimeout(() => {
+        setPhase('in')
+        sfx.glass()
+      }, 600 + STAMP_DEFS.length * 25 + 650)
+    }
+  }
 
   const pick = (s: StampDef) => {
     setHeld((h) => (h === s.id ? null : s.id))
@@ -155,35 +167,41 @@ export function Stamps() {
             <p className="stamps-empty">{heldDef ? `Now press the ${heldDef.name.toLowerCase()} on the page.` : poured ? 'Pick up a stamp from the table.' : 'Open the tin of stamps.'}</p>
           )}
         </div>
-        <button type="button" ref={tinRef} className={`stamps-tin${poured ? ' is-tipped' : ''}`} onClick={pour} disabled={poured} aria-label="Open the tin and pour out the stamps">
-          <img src={tin} alt="" draggable={false} />
-        </button>
-      </div>
-      {poured && (
-      <div className="stamps-tray" ref={trayRef} style={{ aspectRatio: TABLE_ASPECT }}>
-        <img className="stamps-table" src={table} alt="" draggable={false} />
-        {STAMP_DEFS.map((s) => (
-          <span
-            key={s.id}
-            className={`stamps-piece${held === s.id ? ' is-held' : ''}${fly ? ' is-pouring' : ' is-waiting'}`}
-            style={{
-              left: `${s.x}%`, top: `${s.y}%`, width: `${s.w}%`, height: `${s.h}%`,
-              ['--fx' as string]: `${fly?.[s.id][0] ?? 0}px`, ['--fy' as string]: `${fly?.[s.id][1] ?? 0}px`, ['--fr' as string]: `${fly?.[s.id][2] ?? 0}deg`, ['--d' as string]: `${300 + s.id * 38}ms`,
-            }}
+        <div className="stamps-tray" ref={trayRef} style={{ aspectRatio: TABLE_ASPECT }}>
+          <img className="stamps-table" src={table} alt="" draggable={false} />
+          {phase !== 'in' &&
+            STAMP_DEFS.map((s) => (
+              <span
+                key={s.id}
+                className={`stamps-piece${held === s.id ? ' is-held' : ''}${phase === 'pouring' ? ' is-pouring' : phase === 'packing' ? ' is-packing' : ''}`}
+                style={{
+                  left: `${s.x}%`, top: `${s.y}%`, width: `${s.w}%`, height: `${s.h}%`,
+                  ['--fx' as string]: `${fly[s.id]?.[0] ?? 0}px`, ['--fy' as string]: `${fly[s.id]?.[1] ?? 0}px`, ['--fr' as string]: `${fly[s.id]?.[2] ?? 0}deg`,
+                  ['--d' as string]: `${phase === 'packing' ? 600 + (STAMP_DEFS.length - 1 - s.id) * 25 : 300 + s.id * 38}ms`,
+                }}
+              >
+                <button
+                  type="button"
+                  className="stamps-hit"
+                  style={{ clipPath: `polygon(${s.poly.map(([x, y]) => `${x}% ${y}%`).join(', ')})` }}
+                  onClick={() => pick(s)}
+                  disabled={phase !== 'out'}
+                  aria-pressed={held === s.id}
+                  aria-label={`Pick up the ${s.name} stamp`}
+                />
+                <img src={stampSrc(s)} alt="" draggable={false} />
+              </span>
+            ))}
+          <button
+            type="button"
+            className={`stamps-tin${phase === 'out' ? ' is-corner' : ''}${phase === 'pouring' || phase === 'packing' ? ' is-tipped' : ''}`}
+            onClick={toggleTin}
+            aria-label={phase === 'in' ? 'Open the tin and pour out the stamps' : 'Put the stamps back in the tin'}
           >
-            <button
-              type="button"
-              className="stamps-hit"
-              style={{ clipPath: `polygon(${s.poly.map(([x, y]) => `${x}% ${y}%`).join(', ')})` }}
-              onClick={() => pick(s)}
-              aria-pressed={held === s.id}
-              aria-label={`Pick up the ${s.name} stamp`}
-            />
-            <img src={stampSrc(s)} alt="" draggable={false} />
-          </span>
-        ))}
+            <img src={tin} alt="" draggable={false} />
+          </button>
+        </div>
       </div>
-      )}
       <figcaption className="stamps-bar">
         <span className="stamps-now">
           <i style={{ background: PADS[ink].color }} aria-hidden="true" /> {PADS[ink].name} ink
