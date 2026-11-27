@@ -9,6 +9,7 @@ import { Stamps } from './toys/Stamps'
 import { Carve } from './toys/Carve'
 import { TinyBook } from './toys/TinyBook'
 import { SakuraBottle } from './toys/SakuraBottle'
+import { ToyBoundary } from './toys/ToyBoundary'
 
 const EMAIL = 'nehhaank@gmail.com'
 
@@ -194,12 +195,12 @@ export default function App() {
           </div>
           <div className="ledge">
             <div className="ledge-items">
-              <Bloom />
+              <ToyBoundary><Bloom /></ToyBoundary>
               <div className="fris-spot">
                 <span className="fris-home" aria-hidden="true" />
                 <p className="fris-hint">Flick the frisbee. Or tap it, and go find where it lands.</p>
               </div>
-              <StickyNotes />
+              <ToyBoundary><StickyNotes /></ToyBoundary>
             </div>
           </div>
         </section>
@@ -273,24 +274,24 @@ export default function App() {
           <Head id="making-h" n="05" title={<>Made <em>by hand</em></>} note="Away from screens: clay, erasers, wood and paper. Everything here is real, and you can play with all of it." />
           <div className="table">
             <article className="craft craft-clay">
-              <ClayTicTacToe />
+              <ToyBoundary><ClayTicTacToe /></ToyBoundary>
               <h3>Clay tic-tac-toe</h3>
               <p>Some Thatte Idli and Kaal Soup for the Bangalorean soul. Unfortunately, I haven&rsquo;t figured out how to serve food through a website. Tic-tac-toe, instead?</p>
             </article>
             <article className="craft craft-stamps">
-              <Stamps />
+              <ToyBoundary><Stamps /></ToyBoundary>
               <h3>Carved stamps</h3>
               <p>A little collection of my hand-carved stamps, brought to the digital world. Go ahead, leave your mark!</p>
             </article>
             <article className="craft craft-spoon">
-              <Carve />
+              <ToyBoundary><Carve /></ToyBoundary>
               <h3>A carved spoon</h3>
               <p>Whittled from a single piece of wood. Yours will take less time.</p>
             </article>
             <article className="craft craft-book">
-              <TinyBook />
+              <ToyBoundary><TinyBook /></ToyBoundary>
               <h3>A teeny tiny book</h3>
-              <p>Bound in suede, with mushrooms inside.</p>
+              <p>A tiny mushroom guide as I had not <em>mushroom</em> else to do.</p>
             </article>
           </div>
           <ul className="also-made">
@@ -302,7 +303,7 @@ export default function App() {
 
         <section id="hello" className="hello" aria-labelledby="hello-h" data-name="Say hello">
           <div className="hello-inner">
-            <SakuraBottle />
+            <ToyBoundary><SakuraBottle /></ToyBoundary>
             <Head id="hello-h" n="06" dark title={<>Say <em>hello</em></>} />
             <a className="hello-mail" href={`mailto:${EMAIL}`} data-reveal>
               <span>{EMAIL}</span>
@@ -320,7 +321,7 @@ export default function App() {
           </div>
         </section>
       </main>
-      <Frisbee />
+      <ToyBoundary><Frisbee /></ToyBoundary>
     </>
   )
 }

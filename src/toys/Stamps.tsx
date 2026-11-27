@@ -111,7 +111,7 @@ export function Stamps() {
     for (let i = 0; i < 9; i++) sfx.rub(i * 0.2)
     const t0 = performance.now()
     const step = (now: number) => {
-      const t = Math.min(1, (now - t0) / ERASE_MS)
+      const t = Math.max(0, Math.min(1, (now - t0) / ERASE_MS))
       setWipe(t)
       if (t < 1) requestAnimationFrame(step)
       else {

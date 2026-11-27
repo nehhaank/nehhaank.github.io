@@ -133,7 +133,7 @@ export function Frisbee() {
       setThrown((n) => n + 1)
       sfx.whoosh()
       const step = (now: number) => {
-        const k = Math.min(1, (now - t0) / (T * 1000))
+        const k = Math.max(0, Math.min(1, (now - t0) / (T * 1000)))
         const u = 1 - Math.pow(1 - k, 2.2)
         const iu = 1 - u
         p.x = iu * iu * sx + 2 * iu * u * cx + u * u * tx

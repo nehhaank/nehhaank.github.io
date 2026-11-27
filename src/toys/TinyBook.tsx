@@ -66,7 +66,8 @@ export function TinyBook() {
     const t0 = performance.now()
     const steps = Math.abs(b - a)
     const step = (now: number) => {
-      const k = Math.min(steps, Math.floor(((now - t0) / 1000) * FPS))
+      // Safari can stamp the first frame slightly before t0, so never step backwards past the start
+      const k = Math.max(0, Math.min(steps, Math.floor(((now - t0) / 1000) * FPS)))
       setFrame(a + k * dir)
       if (k < steps) raf.current = requestAnimationFrame(step)
       else {
