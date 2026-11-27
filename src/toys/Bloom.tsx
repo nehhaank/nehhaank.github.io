@@ -51,15 +51,28 @@ export function Bloom() {
     return () => cancelAnimationFrame(raf.current)
   }, [done])
 
-  const start = (e: React.PointerEvent) => {
-    e.preventDefault()
-    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+  // With a mouse, the bud opens while the cursor rests on it. On touch screens there is no hover,
+  // so it opens while a finger is held on it instead.
+  const canHover = typeof window !== 'undefined' && window.matchMedia?.('(hover: hover)').matches
+  const begin = () => {
     holding.current = true
     setHeld(true)
   }
   const stop = () => {
     holding.current = false
     setHeld(false)
+  }
+  const onEnter = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse' || e.pointerType === 'pen') begin()
+  }
+  const onDown = (e: React.PointerEvent) => {
+    if (e.pointerType === 'mouse') return
+    e.preventDefault()
+    ;(e.currentTarget as HTMLElement).setPointerCapture(e.pointerId)
+    begin()
+  }
+  const onUp = (e: React.PointerEvent) => {
+    if (e.pointerType !== 'mouse') stop()
   }
 
   const ease = (x: number) => x * x * (3 - 2 * x)
@@ -73,13 +86,14 @@ export function Bloom() {
       <button
         type="button"
         className={`bloom-hit${held ? ' is-held' : ''}${p >= 1 ? ' is-open' : ''}`}
-        onPointerDown={start}
-        onPointerUp={stop}
+        onPointerEnter={onEnter}
+        onPointerDown={onDown}
+        onPointerUp={onUp}
         onPointerCancel={stop}
         onPointerLeave={stop}
         onKeyDown={(e) => (e.key === ' ' || e.key === 'Enter') && ((holding.current = true), setHeld(true))}
         onKeyUp={stop}
-        aria-label={p >= 1 ? 'The jasmine is in bloom' : 'Press and hold to make the jasmine bloom'}
+        aria-label={p >= 1 ? 'The jasmine is in bloom' : canHover ? 'Hover over the bud to make the jasmine bloom' : 'Touch and hold to make the jasmine bloom'}
       >
         <span className="bloom-photo" aria-hidden="true">
           <span className="bloom-frame" style={tile(f0)} />
@@ -92,7 +106,7 @@ export function Bloom() {
           </svg>
         )}
       </button>
-      <figcaption>{p >= 1 ? 'In bloom.' : p > 0 ? 'Keep holding…' : 'Press and hold the bud.'}</figcaption>
+      <figcaption>{p >= 1 ? 'In bloom.' : p > 0 ? (canHover ? 'Stay a while…' : 'Keep holding…') : canHover ? 'Good things come to those who hover.' : 'Touch and hold the bud.'}</figcaption>
     </figure>
   )
 }
