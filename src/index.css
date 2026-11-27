@@ -719,7 +719,7 @@ main > section.hello { margin-top: clamp(112px, 13vw, 184px); background: none; 
 .stamps-tray { position: relative; width: min(100%, 760px); overflow: visible; border-radius: 6px; }
 .stamps-tray .stamps-table { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.35); }
 .stamps-piece { position: absolute; display: block; z-index: 1; }
-.stamps-piece img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; transition: transform 0.3s var(--spring), filter 0.3s ease; filter: drop-shadow(0 1px 1px rgba(40, 30, 10, 0.25)); }
+.stamps-piece img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; transition: transform 0.3s var(--spring), filter 0.3s ease; }
 .stamps-hit { position: absolute; inset: 0; z-index: 1; padding: 0; border: 0; background: transparent; cursor: grab; }
 .stamps-piece:has(.stamps-hit:hover), .stamps-piece.is-held { z-index: 3; }
 .stamps-hit:hover + img { transform: translateY(-7%) scale(1.03); filter: drop-shadow(0 9px 6px rgba(40, 30, 10, 0.3)); }
