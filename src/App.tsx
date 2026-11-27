@@ -280,7 +280,7 @@ export default function App() {
             <article className="craft craft-stamps">
               <Stamps />
               <h3>Carved stamps</h3>
-              <p>Cut from erasers with a craft knife, one tiny drawing at a time.</p>
+              <p>A little collection of my hand-carved stamps, brought to the digital world. Go ahead, leave your mark!</p>
             </article>
             <article className="craft craft-spoon">
               <Carve />
