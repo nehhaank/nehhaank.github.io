@@ -703,3 +703,11 @@ main > section.hello { margin-top: clamp(112px, 13vw, 184px); background: none; 
 .fm-catch, .fm-disc { fill: var(--mustard); }
 .fm-dist { fill: var(--caramel); }
 .fm-throw { stroke: var(--mustard); stroke-width: 4; }
+
+/* ---------- jasmine bloom (real frames) ---------- */
+.bloom-hit { width: 150px; height: 188px; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 22px rgba(30, 40, 20, 0.22); }
+.bloom-hit:hover { transform: rotate(-1deg); }
+.bloom-photo { position: absolute; inset: 0; display: block; background-repeat: no-repeat; background-color: #20271c; }
+.bloom-ring { right: 8px; top: 8px; width: 30px !important; height: 30px !important; }
+.bloom-ring circle { stroke: rgba(255, 255, 255, 0.3); }
+.bloom-ring circle.on { stroke: #fff; }
