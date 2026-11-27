@@ -522,8 +522,11 @@ main > section.field { background: none; color: var(--ink); overflow: visible; }
 .craft > p { font-size: 14.5px; color: var(--ink-soft); }
 .craft .chip-btn, .chip-btn { background: var(--sage-deep); color: var(--paper); font-size: 13px; padding: 7px 14px; }
 .craft .chip-btn:hover, .chip-btn:hover { background: var(--ink); transform: none; }
-.ttt-leaf { width: min(100%, 360px); transform: rotateX(22deg) rotateZ(-5deg); filter: drop-shadow(0 14px 12px rgba(20, 40, 10, 0.22)); }
-.ttt-leaf:hover { transform: rotateX(18deg) rotateZ(-4deg); }
+.ttt-leaf { width: min(100%, 440px); aspect-ratio: 760 / 641; transform: none; filter: drop-shadow(0 12px 10px rgba(20, 40, 10, 0.25)); }
+.ttt-leaf:hover { transform: none; }
+.ttt-leaf-art { object-fit: contain; user-select: none; -webkit-user-drag: none; }
+.ttt-grid { inset: 0; display: block; }
+.ttt-cell { position: absolute; aspect-ratio: 1; transform: translate(-50%, -50%); border-radius: 50%; }
 .ttt figcaption, .carve figcaption { font-size: 13.5px; color: var(--ink-soft); }
 .ttt-score { background: none; padding: 0; color: var(--ink-soft); }
 .stamps-tray { width: min(100%, 320px); transform: none; box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.35); border-radius: 4px; }
