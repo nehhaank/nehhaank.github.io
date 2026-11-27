@@ -106,7 +106,7 @@ export function Bloom() {
           </svg>
         )}
       </button>
-      <figcaption>{p >= 1 ? 'In bloom.' : p > 0 ? (canHover ? 'Stay a while…' : 'Keep holding…') : canHover ? 'Rest your cursor on the bud.' : 'Touch and hold the bud.'}</figcaption>
+      <figcaption>{p >= 1 ? 'In bloom.' : p > 0 ? (canHover ? 'Stay a while…' : 'Keep holding…') : canHover ? 'Good things come to those who hover.' : 'Touch and hold the bud.'}</figcaption>
     </figure>
   )
 }
