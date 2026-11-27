@@ -1,46 +1,52 @@
 import { useRef, useState } from 'react'
-import tray from '../assets/craft/tray.jpg'
-import leaf from '../assets/craft/ink-leaf.png'
-import paw from '../assets/craft/ink-paw.png'
-import rocket from '../assets/craft/ink-rocket.png'
-import snow from '../assets/craft/ink-snow.png'
-import eiffel from '../assets/craft/ink-eiffel.png'
-import mountain from '../assets/craft/ink-mountain.png'
+import table from '../assets/stamps/table.webp'
+import { STAMP_DEFS, TABLE_ASPECT, type StampDef } from './stampsData'
 import { sfx } from './sound'
 
-// Hand-carved eraser stamps, photographed on the cutting mat. Tap one and it stamps the paper;
-// the prints are traced from the carved faces in that photo. The eraser rubs them all out again.
-const STAMPS = [
-  { id: 'eiffel', name: 'Eiffel Tower', x: 52.7, y: 14.9, ink: eiffel, w: 64 },
-  { id: 'mountain', name: 'Mountain', x: 37.7, y: 32.8, ink: mountain, w: 86 },
-  { id: 'leaf', name: 'Leaf', x: 18.1, y: 44.4, ink: leaf, w: 66 },
-  { id: 'paw', name: 'Paw print', x: 66.7, y: 42.1, ink: paw, w: 76 },
-  { id: 'rocket', name: 'Rocket', x: 81.5, y: 57, ink: rocket, w: 66 },
-  { id: 'snow', name: 'Snowflake', x: 62.5, y: 84.4, ink: snow, w: 92 },
-]
-const INKS = ['#232a63', '#8b1e2d', '#1f4d34']
+// Neha's hand-carved eraser stamps, photographed on her table. Each one is cut out of the photo
+// so it can be picked up on its own; pressing it on the paper leaves its real print, cut from a
+// sheet of test prints she made with the same stamps. The eraser rubs them all out again.
+const STAMP_IMG = import.meta.glob('../assets/stamps/stamp-*.webp', { eager: true, import: 'default' }) as Record<string, string>
+const INK_IMG = import.meta.glob('../assets/stamps/ink-*.webp', { eager: true, import: 'default' }) as Record<string, string>
+const stampSrc = (s: StampDef) => STAMP_IMG[`../assets/stamps/stamp-${String(s.id).padStart(2, '0')}.webp`]
+const inkSrc = (s: StampDef) => INK_IMG[`../assets/stamps/ink-${s.ink}.webp`]
 
-type Print = { k: number; src: string; x: number; y: number; r: number; w: number; o: number; c: string }
-type Press = { k: number; x: number; y: number; w: number; r: number }
+const INKS = ['#8b1e2d', '#232a63', '#1f4d34']
+// a print's width on the paper, as % of the paper's width, per pixel on the test sheet
+const PER_PX = 0.13
+const MAX_PX = 210
+
+type Print = { k: number; src: string; x: number; y: number; r: number; w: number; ar: number; o: number; c: string }
+type Press = { k: number; x: number; y: number; w: number; ar: number; r: number }
 
 export function Stamps() {
   const [prints, setPrints] = useState<Print[]>([])
   const [press, setPress] = useState<Press[]>([])
   const [erasing, setErasing] = useState(false)
   const [ink, setInk] = useState(0)
+  const [held, setHeld] = useState<number | null>(null)
   const n = useRef(0)
 
-  const stamp = (s: (typeof STAMPS)[number]) => {
-    if (erasing) return
+  const pick = (s: StampDef) => {
+    setHeld((h) => (h === s.id ? null : s.id))
+    sfx.clack()
+  }
+
+  const stampAt = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (erasing || held === null) return
+    const s = STAMP_DEFS[held]
+    const box = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - box.left) / box.width) * 100
+    const y = ((e.clientY - box.top) / box.height) * 100
     const k = n.current++
-    const x = 12 + Math.random() * 76
-    const y = 16 + Math.random() * 68
-    const r = (Math.random() - 0.5) * 24
-    const w = s.w * (0.92 + Math.random() * 0.16)
-    setPress((p) => [...p, { k, x, y, w, r }])
+    const r = (Math.random() - 0.5) * 10
+    const scale = Math.min(1, MAX_PX / Math.max(s.iw, s.ih))
+    const w = s.iw * scale * PER_PX * (0.97 + Math.random() * 0.06)
+    const ar = s.iw / s.ih
+    setPress((p) => [...p, { k, x, y, w, ar, r }])
     window.setTimeout(() => {
       sfx.stamp()
-      setPrints((p) => [...p.slice(-40), { k, src: s.ink, x, y, r, w, o: 0.72 + Math.random() * 0.25, c: INKS[ink] }])
+      setPrints((p) => [...p.slice(-60), { k, src: inkSrc(s), x, y, r, w, ar, o: 0.78 + Math.random() * 0.2, c: INKS[ink] }])
     }, 330)
     window.setTimeout(() => setPress((p) => p.filter((q) => q.k !== k)), 760)
   }
@@ -55,25 +61,41 @@ export function Stamps() {
     }, 1450)
   }
 
+  const heldDef = held === null ? null : STAMP_DEFS[held]
+
   return (
     <figure className="stamps">
-      <div className="stamps-tray">
-        <img src={tray} alt="Hand-carved eraser stamps on a cutting mat" draggable={false} />
-        {STAMPS.map((s) => (
-          <button type="button" key={s.id} className="stamps-hot" style={{ left: `${s.x}%`, top: `${s.y}%` }} onClick={() => stamp(s)} aria-label={`Stamp the ${s.name}`} />
+      <div className="stamps-tray" style={{ aspectRatio: TABLE_ASPECT }}>
+        <img className="stamps-table" src={table} alt="" draggable={false} />
+        {STAMP_DEFS.map((s) => (
+          <span
+            key={s.id}
+            className={`stamps-piece${held === s.id ? ' is-held' : ''}`}
+            style={{ left: `${s.x}%`, top: `${s.y}%`, width: `${s.w}%`, height: `${s.h}%` }}
+          >
+            <button
+              type="button"
+              className="stamps-hit"
+              style={{ clipPath: `polygon(${s.poly.map(([x, y]) => `${x}% ${y}%`).join(', ')})` }}
+              onClick={() => pick(s)}
+              aria-pressed={held === s.id}
+              aria-label={`Pick up the ${s.name} stamp`}
+            />
+            <img src={stampSrc(s)} alt="" draggable={false} />
+          </span>
         ))}
       </div>
-      <div className={`stamps-paper${erasing ? ' is-erasing' : ''}`}>
+      <div className={`stamps-paper${erasing ? ' is-erasing' : ''}${heldDef ? ' is-ready' : ''}`} onClick={stampAt}>
         {prints.map((p) => (
           <span
             key={p.k}
             className="stamps-print"
-            style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.w, height: p.w, transform: `translate(-50%, -50%) rotate(${p.r}deg)`, opacity: p.o, background: p.c, WebkitMaskImage: `url(${p.src})`, maskImage: `url(${p.src})` }}
+            style={{ left: `${p.x}%`, top: `${p.y}%`, width: `${p.w}%`, aspectRatio: p.ar, transform: `translate(-50%, -50%) rotate(${p.r}deg)`, opacity: p.o, background: p.c, WebkitMaskImage: `url(${p.src})`, maskImage: `url(${p.src})` }}
             aria-hidden="true"
           />
         ))}
         {press.map((p) => (
-          <span key={p.k} className="stamps-block" style={{ left: `${p.x}%`, top: `${p.y}%`, width: p.w + 18, height: p.w + 10, ['--r' as string]: `${p.r}deg` }} aria-hidden="true" />
+          <span key={p.k} className="stamps-block" style={{ left: `${p.x}%`, top: `${p.y}%`, width: `calc(${p.w}% + 14px)`, aspectRatio: p.ar, ['--r' as string]: `${p.r}deg` }} aria-hidden="true" />
         ))}
         {erasing && (
           <>
@@ -83,12 +105,14 @@ export function Stamps() {
             ))}
           </>
         )}
-        {prints.length === 0 && !erasing && <p className="stamps-empty">Tap a stamp in the tray.</p>}
+        {prints.length === 0 && !erasing && (
+          <p className="stamps-empty">{heldDef ? `Now press the ${heldDef.name.toLowerCase()} on the paper.` : 'Pick up a stamp from the table.'}</p>
+        )}
       </div>
       <figcaption className="stamps-bar">
         <span className="stamps-inks" role="radiogroup" aria-label="Ink colour">
           {INKS.map((c, i) => (
-            <button type="button" key={c} role="radio" aria-checked={ink === i} aria-label={['Indigo', 'Red', 'Green'][i] + ' ink'} className={`stamps-pad${ink === i ? ' is-on' : ''}`} style={{ background: c }} onClick={() => setInk(i)} />
+            <button type="button" key={c} role="radio" aria-checked={ink === i} aria-label={['Red', 'Indigo', 'Green'][i] + ' ink'} className={`stamps-pad${ink === i ? ' is-on' : ''}`} style={{ background: c }} onClick={() => setInk(i)} />
           ))}
         </span>
         <button type="button" className="stamps-erase" onClick={erase} disabled={erasing || prints.length === 0} aria-label="Erase the stamps">
