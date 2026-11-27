@@ -275,7 +275,7 @@ export default function App() {
             <article className="craft craft-clay">
               <ClayTicTacToe />
               <h3>Clay tic-tac-toe</h3>
-              <p>Bowls of Kaal soup against Thatte idlis, on a banana leaf. All clay.</p>
+              <p>Some Thatte Idli and Kaal Soup for the Bangalorean soul. Unfortunately, I haven&rsquo;t figured out how to serve food through a website. Tic-tac-toe, instead?</p>
             </article>
             <article className="craft craft-stamps">
               <Stamps />
