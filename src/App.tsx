@@ -291,7 +291,7 @@ export default function App() {
             <article className="craft craft-book">
               <ToyBoundary><TinyBook /></ToyBoundary>
               <h3>A teeny tiny book</h3>
-              <p>Bound in suede, with mushrooms inside.</p>
+              <p>A tiny mushroom guide as I had not <em>mushroom</em> else to do.</p>
             </article>
           </div>
           <ul className="also-made">
