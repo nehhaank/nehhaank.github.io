@@ -326,11 +326,14 @@ main > section.field { position: relative; background: #1d4630; color: var(--on-
 
 /* tiny book */
 .tb { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
-.tb-stage { position: relative; width: min(100%, 440px); aspect-ratio: 1; border-radius: 10px; overflow: hidden; box-shadow: 0 12px 26px -14px rgba(0, 0, 0, 0.45); background: #e9e4dc; }
-.tb-stage img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; }
-.tb-hit { position: absolute; top: 0; bottom: 0; width: 50%; z-index: 2; border: 0; padding: 0; background: none; cursor: pointer; }
-.tb-hit.is-prev { left: 0; cursor: w-resize; }
-.tb-hit.is-next { right: 0; cursor: e-resize; }
+.tb-stage { position: relative; width: min(100%, 500px); aspect-ratio: 1019 / 1077; }
+/* the opening in the gilt frame; the video sits just under its inner edge */
+.tb-window { position: absolute; left: 20.4%; top: 20.4%; width: 57.3%; height: 61.5%; overflow: hidden; background: #e9e4dc; }
+.tb-window img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; }
+.tb-gilt { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; filter: drop-shadow(0 14px 14px rgba(40, 25, 0, 0.35)); }
+.tb-hit { position: absolute; top: 21%; height: 60%; width: 28%; z-index: 2; border: 0; padding: 0; background: none; cursor: pointer; }
+.tb-hit.is-prev { left: 21%; cursor: w-resize; }
+.tb-hit.is-next { left: 49%; cursor: e-resize; }
 .tb-hit:disabled { cursor: default; }
 .tb-hit:focus-visible { outline: 2px solid var(--ink); outline-offset: -4px; border-radius: 10px; }
 .tb-dots { display: flex; gap: 5px; }

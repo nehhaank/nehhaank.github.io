@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
+import gilt from '../assets/book/gilt-frame.webp'
 import { sfx } from './sound'
 
 // Neha's teeny tiny suede book of mushrooms, filmed in her fingers as she flipped through it.
 // The video is cut into frames: each spread is one still frame, and turning a page plays the
 // frames between two spreads. Tap the right page to turn forward, the left one to go back.
+// It hangs in a mossy gilt frame, with the frame's little mushrooms sitting over the picture.
 const FRAME_IMG = import.meta.glob('../assets/book/f*.webp', { eager: true, import: 'default' }) as Record<string, string>
 const FRAMES = Object.keys(FRAME_IMG)
   .sort()
@@ -80,7 +82,10 @@ export function TinyBook() {
   return (
     <figure className="tb">
       <div className="tb-stage" ref={stage}>
-        <img src={FRAMES[frame].src} alt="Neha's tiny suede-bound book of hand-drawn mushrooms, held open between her fingers" draggable={false} />
+        <div className="tb-window">
+          <img src={FRAMES[frame].src} alt="Neha's tiny suede-bound book of hand-drawn mushrooms, held open between her fingers" draggable={false} />
+        </div>
+        <img className="tb-gilt" src={gilt} alt="" draggable={false} />
         <button type="button" className="tb-hit is-prev" onClick={() => turn(-1)} disabled={spread === 0 || turning} aria-label="Previous page" />
         <button type="button" className="tb-hit is-next" onClick={() => turn(1)} disabled={turning} aria-label={spread === 0 ? 'Open the book' : spread === LAST ? 'Read it again' : 'Next page'} />
       </div>
