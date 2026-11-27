@@ -126,14 +126,14 @@ main > section { margin: 0 auto; }
 .fris:active { cursor: grabbing; }
 .fris-shadow { pointer-events: none; z-index: 39; border-radius: 50%; background: radial-gradient(closest-side, rgba(60, 30, 0, 0.75), rgba(60, 30, 0, 0)); }
 .fris-art { position: absolute; inset: 0; transform-style: preserve-3d; }
-.fris-art::before { content: ''; position: absolute; inset: 2px; border-radius: 50%; background: #9c5f0a; transform: translateZ(-6px); }
-.fris-art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; filter: drop-shadow(0 1px 0 rgba(120, 60, 0, 0.5)); }
-.fris:hover .fris-art svg { filter: drop-shadow(0 1px 0 rgba(120, 60, 0, 0.5)) brightness(1.05); }
+.fris-art::before { content: ''; position: absolute; inset: 2px; border-radius: 50%; background: #cfcfca; transform: translateZ(-6px); }
+.fris-art img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; border-radius: 50%; user-select: none; -webkit-user-drag: none; filter: drop-shadow(0 1px 0 rgba(60, 60, 55, 0.45)); }
+.fris:hover .fris-art img { filter: drop-shadow(0 1px 0 rgba(60, 60, 55, 0.45)) brightness(1.04); }
 .fris.is-found::after { content: ''; position: absolute; inset: -16px; border-radius: 50%; border: 3px solid var(--terracotta); animation: found 1.4s var(--ease) 2 both; }
 @keyframes found { from { transform: scale(0.6); opacity: 1; } to { transform: scale(1.8); opacity: 0; } }
 .fris-chip { position: fixed; left: 50%; bottom: 22px; z-index: 70; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 10px; border: 0; cursor: pointer; padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--paper); font-size: 15px; box-shadow: 0 10px 30px rgba(43, 29, 18, 0.3); animation: chip-in 0.5s var(--spring) both; }
 .fris-chip:hover { background: var(--terracotta); }
-.fris-chip-dot { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff3c4, var(--saffron) 45%, #b8730c); }
+.fris-chip-dot { width: 14px; height: 14px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #fff, #e6e6e2 60%, #b9b9b4); }
 @keyframes chip-in { from { transform: translate(-50%, 30px); opacity: 0; } }
 
 /* ---------- bloom ---------- */

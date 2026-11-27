@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import disc from '../assets/craft/frisbee-top.png'
 import { sfx } from './sound'
 
 // A frisbee that lives on the page, not in the viewport. Drag and flick it, or tap it for a long throw,
@@ -241,28 +242,7 @@ export function Frisbee() {
         }}
       >
         <div className="fris-art" ref={art}>
-          <svg viewBox="0 0 100 100" aria-hidden="true">
-            <defs>
-              <radialGradient id="fr-top" cx="42%" cy="36%" r="70%">
-                <stop offset="0" stopColor="#fff3c4" />
-                <stop offset="0.35" stopColor="#f6c13a" />
-                <stop offset="0.8" stopColor="#e39a14" />
-                <stop offset="1" stopColor="#b8730c" />
-              </radialGradient>
-              <radialGradient id="fr-rim" cx="50%" cy="50%" r="50%">
-                <stop offset="0.86" stopColor="rgba(0,0,0,0)" />
-                <stop offset="0.93" stopColor="rgba(120,60,0,0.35)" />
-                <stop offset="1" stopColor="rgba(255,240,200,0.6)" />
-              </radialGradient>
-            </defs>
-            <circle cx="50" cy="50" r="49" fill="url(#fr-top)" />
-            <circle cx="50" cy="50" r="49" fill="url(#fr-rim)" />
-            <circle cx="50" cy="50" r="34" fill="none" stroke="rgba(110,55,5,0.32)" strokeWidth="1.2" />
-            <circle cx="50" cy="50" r="29" fill="none" stroke="rgba(110,55,5,0.22)" strokeWidth="0.8" />
-            <path d="M50 30 c4 6 4 10 0 14 c-4 -4 -4 -8 0 -14z M70 50 c-6 4 -10 4 -14 0 c4 -4 8 -4 14 0z M50 70 c-4 -6 -4 -10 0 -14 c4 4 4 8 0 14z M30 50 c6 -4 10 -4 14 0 c-4 4 -8 4 -14 0z" fill="#b8460f" opacity="0.85" />
-            <circle cx="50" cy="50" r="3.2" fill="#7a2e08" />
-            <ellipse cx="38" cy="28" rx="16" ry="7" fill="rgba(255,255,255,0.35)" transform="rotate(-24 38 28)" />
-          </svg>
+          <img src={disc} alt="" draggable={false} />
         </div>
       </div>
       {away && (
