@@ -359,7 +359,7 @@ main > section.hello { position: relative; margin-top: clamp(96px, 11vw, 168px);
 .hello::before { content: ''; position: absolute; left: 50%; top: -40%; width: 120vw; height: 90%; transform: translateX(-50%); background: radial-gradient(closest-side, rgba(240, 168, 30, 0.22), transparent); pointer-events: none; }
 .hello-inner { position: relative; width: var(--col); margin: 0 auto; padding: clamp(64px, 8vw, 110px) 0 0; display: flex; flex-direction: column; align-items: center; text-align: center; }
 .bottle { display: flex; flex-direction: column; align-items: center; gap: 4px; margin-bottom: 24px; }
-.bottle-canvas { width: 260px; height: auto; aspect-ratio: 300 / 380; cursor: grab; touch-action: none; }
+.bottle-canvas { width: 300px; height: auto; aspect-ratio: 1; cursor: grab; touch-action: none; }
 .bottle-canvas:active { cursor: grabbing; }
 .bottle figcaption { font-size: 14px; color: var(--on-dark-soft); }
 .hello .sh { margin-bottom: 28px; }
@@ -545,7 +545,7 @@ main > section.field { background: none; color: var(--ink); overflow: visible; }
 main > section.hello { margin-top: clamp(112px, 13vw, 184px); background: none; color: var(--ink); overflow: visible; }
 .hello::before { display: none; }
 .hello-inner { padding-top: 0; }
-.bottle-canvas { width: 220px; }
+.bottle-canvas { width: 250px; }
 .bottle figcaption { font-size: 12.5px; }
 .hello-mail { font-size: min(6vw, 3.4rem); font-weight: 400; letter-spacing: -0.03em; background-image: linear-gradient(var(--ink), var(--ink)); background-size: 100% 1px; }
 .hello-mail:hover { background-size: 0% 1px; }
