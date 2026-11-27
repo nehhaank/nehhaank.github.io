@@ -713,3 +713,45 @@ main > section.hello { margin-top: clamp(112px, 13vw, 184px); background: none; 
 .bloom-ring { right: -6px; top: 0; width: 30px !important; height: 30px !important; }
 @keyframes jas-breathe { 0%, 100% { transform: rotate(0) scale(1); } 50% { transform: rotate(1.2deg) scale(1.015); } }
 @media (prefers-reduced-motion: reduce) { .bloom-hit.is-open .bloom-photo { animation: none; } }
+
+/* ---------- real carved stamps ---------- */
+.craft-stamps, .craft-clay { grid-column: 1 / -1; }
+.stamps-tray { position: relative; width: min(100%, 760px); overflow: visible; border-radius: 6px; }
+.stamps-tray .stamps-table { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 6px; box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.35); }
+.stamps-piece { position: absolute; display: block; z-index: 1; }
+.stamps-piece img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; user-select: none; transition: transform 0.3s var(--spring), filter 0.3s ease; }
+.stamps-hit { position: absolute; inset: 0; z-index: 1; padding: 0; border: 0; background: transparent; cursor: grab; }
+.stamps-piece:has(.stamps-hit:hover), .stamps-piece.is-held { z-index: 3; }
+.stamps-hit:hover + img { transform: translateY(-7%) scale(1.03); filter: drop-shadow(0 9px 6px rgba(40, 30, 10, 0.3)); }
+.stamps-hit:focus-visible + img { outline: 2px solid var(--ink); outline-offset: 2px; }
+.stamps-piece.is-held img { transform: translateY(-12%) scale(1.06); filter: drop-shadow(0 14px 9px rgba(40, 30, 10, 0.32)) drop-shadow(0 0 0 var(--mustard)); }
+.stamps-piece.is-held::after { content: ''; position: absolute; inset: -6%; border-radius: 10px; box-shadow: 0 0 0 2px var(--mustard); pointer-events: none; transform: translateY(-12%); }
+.stamps-paper { width: min(100%, 560px); }
+.stamps-paper.is-ready { cursor: crosshair; }
+.stamps-print { height: auto; }
+.stamps-block { height: auto; }
+.stamps-book { position: relative; width: min(100%, 760px); aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; box-shadow: 0 10px 22px -12px rgba(0, 0, 0, 0.35); }
+.stamps-book.is-ready { cursor: crosshair; }
+.stamps-book-photo { position: absolute; inset: 0; width: 100%; height: 100%; display: block; user-select: none; }
+.stamps-ink { position: absolute; inset: 0; pointer-events: none; }
+.stamps-padhit { position: absolute; border: 0; padding: 0; border-radius: 14px; background: transparent; cursor: pointer; transition: box-shadow 0.25s; }
+.stamps-padhit:hover { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.7); }
+.stamps-padhit.is-on { box-shadow: 0 0 0 3px var(--mustard); }
+.stamps-book .stamps-empty { inset: 20% 3% 10% 58%; color: rgba(60, 50, 30, 0.5); font-size: 16px; text-align: center; padding: 0 6%; }
+.stamps-eraser.is-wiping { animation: none; transform: translate(-50%, -50%) rotate(-8deg); transition: none; }
+.stamps-now { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-soft); }
+.stamps-now i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+.stamps-desk { display: flex; align-items: center; gap: 2%; width: min(100%, 900px); }
+.stamps-desk .stamps-book { flex: 0 0 76%; width: auto; }
+.stamps-tin { flex: 1 1 auto; padding: 0; border: 0; background: none; cursor: pointer; transform-origin: 30% 90%; transition: transform 0.35s var(--spring); }
+.stamps-tin img { display: block; width: 100%; height: auto; filter: drop-shadow(0 10px 8px rgba(0, 0, 0, 0.3)); user-select: none; }
+.stamps-tin:not(:disabled):hover { transform: translateY(-4px) rotate(-3deg); }
+.stamps-tin:disabled { cursor: default; }
+.stamps-tin.is-tipped { animation: tin-tip 2s var(--ease) both; }
+@keyframes tin-tip { 0% { transform: none; } 18% { transform: rotate(-62deg) translateX(-6%); } 70% { transform: rotate(-66deg) translateX(-6%); } 100% { transform: none; } }
+.stamps-piece.is-waiting { opacity: 0; }
+.stamps-piece.is-pouring { animation: stamp-pour 0.7s cubic-bezier(0.3, 0.6, 0.35, 1.15) var(--d) both; }
+@keyframes stamp-pour { 0% { opacity: 0; transform: translate(var(--fx), var(--fy)) rotate(var(--fr)) scale(0.5); } 12% { opacity: 1; } 100% { opacity: 1; transform: none; } }
+.stamps-tray { width: min(100%, 900px); }
+@media (max-width: 640px) { .stamps-desk { flex-direction: column; } .stamps-desk .stamps-book { flex: none; width: 100%; } .stamps-tin { width: 40%; } }
+@media (prefers-reduced-motion: reduce) { .stamps-piece.is-pouring, .stamps-tin.is-tipped { animation-duration: 0.01s; } }
